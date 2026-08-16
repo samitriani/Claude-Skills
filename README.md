@@ -19,6 +19,21 @@ Sur une commande comme `Analyse locative Saint-Étienne T2 80000 apport 5000`, i
 
 ## Installation
 
+L'installation diffère selon l'application utilisée.
+
+### Claude.ai (app de bureau, web, mobile)
+
+1. Télécharge [`analyse-locative.zip`](analyse-locative.zip) depuis ce dépôt (clique sur le fichier, puis *Download raw file*).
+2. Dans l'app : **Réglages → Capacités (Capabilities) → Skills**. Sur un compte Team/Enterprise, un administrateur doit parfois activer Skills au niveau de l'organisation avant que l'option n'apparaisse.
+3. **Créer/Importer un skill** → sélectionne `analyse-locative.zip`.
+4. Active le skill (bascule on) — globalement ou pour la conversation en cours.
+
+Skills est réservé aux plans payants (Pro, Max, Team, Enterprise) ; l'intitulé exact des menus peut varier selon les déploiements.
+
+Le zip contient uniquement `SKILL.md`, `references/` et `examples/` — pas `README.md` ni `LICENSE`, qui ne servent qu'à la publication GitHub. **Si tu modifies `SKILL.md` ou les fichiers `references/`/`examples/`, régénère le zip avant de le réimporter** (une archive périmée fera tourner l'ancienne version du skill) — voir [Régénérer le zip](#régénérer-le-zip) plus bas.
+
+### Claude Code (CLI, IDE, app de bureau)
+
 Copier le dossier dans le répertoire des skills de Claude :
 
 ```bash
@@ -141,6 +156,7 @@ analyse-locative/
 ├── SKILL.md                          # le skill lui-même
 ├── README.md
 ├── LICENSE
+├── analyse-locative.zip              # package pour l'upload Claude.ai (SKILL.md + references/ + examples/)
 ├── examples/
 │   ├── README.md
 │   ├── t2-ancien-saint-etienne.md    # session complète, ancien
@@ -150,6 +166,60 @@ analyse-locative/
 │   └── sortie-t3-neuf.tsv
 └── references/
     └── calculs.md                    # formules, hypothèses, limites
+```
+
+## Régénérer le zip
+
+Après toute modification de `SKILL.md`, `references/` ou `examples/`, régénérer `analyse-locative.zip` avant de le republier — une archive périmée ferait tourner une version obsolète du skill dans Claude.ai.
+
+**Sous Windows, ne pas utiliser `Compress-Archive`** : la cmdlet stocke les chemins avec des antislashs (`references\calculs.md`), ce qui viole la norme ZIP (séparateur `/` requis) et fait échouer l'import dans Claude.ai avec l'erreur *« Zip file contains path with invalid characters »*. Construire l'archive entrée par entrée via l'API .NET en forçant le séparateur :
+
+```powershell
+$src = "chemin\vers\analyse-locative"
+$dest = "$src\analyse-locative.zip"
+
+Add-Type -AssemblyName System.IO.Compression
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+
+$filesToZip = @(
+    "SKILL.md",
+    "references/calculs.md",
+    "examples/README.md",
+    "examples/en-tetes.tsv",
+    "examples/sortie-t2-ancien.tsv",
+    "examples/sortie-t3-neuf.tsv",
+    "examples/t2-ancien-saint-etienne.md",
+    "examples/t3-neuf-angers.md"
+)
+
+$fs = [System.IO.File]::Open($dest, [System.IO.FileMode]::Create)
+$archive = New-Object System.IO.Compression.ZipArchive($fs, [System.IO.Compression.ZipArchiveMode]::Create)
+
+foreach ($entryName in $filesToZip) {
+    $osPath = $entryName.Replace('/', [System.IO.Path]::DirectorySeparatorChar)
+    $fullPath = Join-Path $src $osPath
+    $entry = $archive.CreateEntry($entryName, [System.IO.Compression.CompressionLevel]::Optimal)
+    $stream = $entry.Open()
+    $bytes = [System.IO.File]::ReadAllBytes($fullPath)
+    $stream.Write($bytes, 0, $bytes.Length)
+    $stream.Close()
+}
+
+$archive.Dispose()
+$fs.Close()
+```
+
+Sous macOS/Linux, la commande `zip` standard n'a pas ce problème :
+
+```bash
+cd analyse-locative
+zip -r analyse-locative.zip SKILL.md references/ examples/
+```
+
+Vérifier ensuite qu'aucune entrée ne contient de `\` :
+
+```bash
+unzip -l analyse-locative.zip
 ```
 
 ## Avertissement
