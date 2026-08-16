@@ -157,6 +157,9 @@ analyse-locative/
 ├── README.md
 ├── LICENSE
 ├── analyse-locative.zip              # package pour l'upload Claude.ai (SKILL.md + references/ + examples/)
+├── .githooks/
+│   ├── pre-commit                    # régénère et ajoute le zip quand une source change
+│   └── build-zip.ps1                 # construction du zip sous Windows (contourne le bug Compress-Archive)
 ├── examples/
 │   ├── README.md
 │   ├── t2-ancien-saint-etienne.md    # session complète, ancien
@@ -170,50 +173,29 @@ analyse-locative/
 
 ## Régénérer le zip
 
-Après toute modification de `SKILL.md`, `references/` ou `examples/`, régénérer `analyse-locative.zip` avant de le republier — une archive périmée ferait tourner une version obsolète du skill dans Claude.ai.
+Un hook `pre-commit` régénère `analyse-locative.zip` automatiquement dès que `SKILL.md`, `references/calculs.md` ou un fichier de `examples/` fait partie du commit — sans lui, une archive périmée ferait tourner une version obsolète du skill dans Claude.ai.
 
-**Sous Windows, ne pas utiliser `Compress-Archive`** : la cmdlet stocke les chemins avec des antislashs (`references\calculs.md`), ce qui viole la norme ZIP (séparateur `/` requis) et fait échouer l'import dans Claude.ai avec l'erreur *« Zip file contains path with invalid characters »*. Construire l'archive entrée par entrée via l'API .NET en forçant le séparateur :
-
-```powershell
-$src = "chemin\vers\analyse-locative"
-$dest = "$src\analyse-locative.zip"
-
-Add-Type -AssemblyName System.IO.Compression
-Add-Type -AssemblyName System.IO.Compression.FileSystem
-
-$filesToZip = @(
-    "SKILL.md",
-    "references/calculs.md",
-    "examples/README.md",
-    "examples/en-tetes.tsv",
-    "examples/sortie-t2-ancien.tsv",
-    "examples/sortie-t3-neuf.tsv",
-    "examples/t2-ancien-saint-etienne.md",
-    "examples/t3-neuf-angers.md"
-)
-
-$fs = [System.IO.File]::Open($dest, [System.IO.FileMode]::Create)
-$archive = New-Object System.IO.Compression.ZipArchive($fs, [System.IO.Compression.ZipArchiveMode]::Create)
-
-foreach ($entryName in $filesToZip) {
-    $osPath = $entryName.Replace('/', [System.IO.Path]::DirectorySeparatorChar)
-    $fullPath = Join-Path $src $osPath
-    $entry = $archive.CreateEntry($entryName, [System.IO.Compression.CompressionLevel]::Optimal)
-    $stream = $entry.Open()
-    $bytes = [System.IO.File]::ReadAllBytes($fullPath)
-    $stream.Write($bytes, 0, $bytes.Length)
-    $stream.Close()
-}
-
-$archive.Dispose()
-$fs.Close()
-```
-
-Sous macOS/Linux, la commande `zip` standard n'a pas ce problème :
+**Activation (une fois par clone)** — git ne suit pas `.git/hooks/`, il faut donc pointer explicitement vers le dossier versionné du dépôt :
 
 ```bash
+git config core.hooksPath .githooks
+```
+
+Le hook ([`.githooks/pre-commit`](.githooks/pre-commit)) détecte les fichiers sources modifiés, régénère le zip et l'ajoute au commit en cours. Sur macOS/Linux il utilise la commande `zip` ; sur Windows, faute de `zip`, il appelle [`.githooks/build-zip.ps1`](.githooks/build-zip.ps1) via PowerShell.
+
+**Pourquoi pas `Compress-Archive`** : sous Windows PowerShell 5.1, cette cmdlet stocke les chemins avec des antislashs (`references\calculs.md`), ce qui viole la norme ZIP (séparateur `/` requis) et fait échouer l'import dans Claude.ai avec l'erreur *« Zip file contains path with invalid characters »*. `build-zip.ps1` construit donc l'archive entrée par entrée via l'API .NET en forçant le bon séparateur.
+
+**Régénération manuelle** (si le hook n'est pas actif, par exemple juste après un clone avant d'avoir lancé la commande ci-dessus) :
+
+```bash
+# macOS / Linux
 cd analyse-locative
 zip -r analyse-locative.zip SKILL.md references/ examples/
+```
+
+```powershell
+# Windows
+powershell -NoProfile -ExecutionPolicy Bypass -File .githooks\build-zip.ps1
 ```
 
 Vérifier ensuite qu'aucune entrée ne contient de `\` :

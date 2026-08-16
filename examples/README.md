@@ -2,6 +2,8 @@
 
 Sessions complètes montrant l'entrée, les paramètres résolus, le contexte marché INSEE, le bloc TSV produit, les verdicts par bien et la recommandation de synthèse.
 
+Ces fichiers sont aussi embarqués dans [`analyse-locative.zip`](../analyse-locative.zip), le package uploadé dans Claude.ai — toute modification ici doit être suivie d'une régénération du zip (automatique via le hook `pre-commit`, voir [Régénérer le zip](../README.md#régénérer-le-zip)).
+
 | Fichier | Cas illustré |
 |---------|--------------|
 | [`t2-ancien-saint-etienne.md`](t2-ancien-saint-etienne.md) | T2 ancien, petit budget, apport fixe — les trois niveaux de fiabilité du loyer, deux verdicts 🟢, deux verdicts 🟡 |
