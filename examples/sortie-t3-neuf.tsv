@@ -1,3 +1,4 @@
+Ville	Adresse / Description	Surface (m²)	Prix achat (€)	Frais notaire (€)	Coût total (€)	Emprunt nécessaire (€)	Mensualité 20 ans (€)	Mensualité 25 ans (€)	Loyer HC (€)	Fiabilité loyer	Charges copro /mois (€)	Taxe foncière /mois (€)	Assurance PNO /mois (€)	Vacance loc. /mois (€)	Rendement brut (%)	Rendement net (%)	Cashflow /mois 25 ans (€)	Lien annonce
 Angers	T3 neuf Saint-Serge 62 m²	62	186000	4650	190650	170650	981	845	720	Estimation marché	85	55	18	60	4.6	3.2	-343	https://exemple.invalid/annonce/an-001
 Angers	T3 neuf Belle-Beille 58 m²	58	172000	4300	176300	156300	898	774	690	Annonce réelle	78	50	17	58	4.8	3.3	-287	https://exemple.invalid/annonce/an-002
 Angers	T3 neuf Monplaisir 60 m²	60	159000	3975	162975	142975	822	708	670	Annonce réelle	72	0	17	56	5.1	3.9	-183	https://exemple.invalid/annonce/an-003

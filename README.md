@@ -1,6 +1,6 @@
 # Analyse Locative
 
-Skill Claude pour rechercher des biens immobiliers locatifs en France, les situer avec des données INSEE, estimer leurs loyers de marché et calculer leurs indicateurs de rendement — puis produire un tableau prêt à coller dans un tableur ainsi qu'une analyse avec un verdict par bien et une recommandation.
+Skill Claude pour rechercher des biens immobiliers locatifs en France, les situer avec des données INSEE, estimer leurs loyers de marché et calculer leurs indicateurs de rendement — puis produire un tableau lisible en un coup d'œil, un export prêt à coller dans un tableur (et un fichier Excel téléchargeable si l'outil est disponible), ainsi qu'une analyse avec un verdict par bien et une recommandation.
 
 **Périmètre : France.** Frais de notaire, taxe foncière, assurance PNO, encadrement des loyers, interdictions de location liées au DPE : tout le modèle de calcul est spécifique au droit français.
 
@@ -14,8 +14,9 @@ Sur une commande comme `Analyse locative Saint-Étienne T2 80000 apport 5000`, i
 2. **situe la ville avec des données INSEE** : démographie, revenu médian, part de locataires, indice des prix immobiliers ;
 3. **estime un loyer de marché** pour chacun, et **qualifie la solidité de cette estimation** ;
 4. **calcule** frais de notaire, coût total, emprunt, mensualités sur 20 et 25 ans, rendement brut, rendement net et cashflow ;
-5. **génère un bloc de 19 colonnes séparées par des tabulations**, à coller directement dans Google Sheets, Excel ou LibreOffice ;
-6. **produit une analyse complète** : un verdict (🟢/🟡/🔴) par bien selon des règles fixes, et une recommandation de synthèse croisée avec le contexte INSEE.
+5. **affiche un tableau de synthèse compact**, lisible immédiatement dans la conversation — pas besoin de le coller où que ce soit pour comprendre les résultats ;
+6. **génère un bloc de 19 colonnes séparées par des tabulations, avec en-tête**, à coller directement dans Google Sheets, Excel ou LibreOffice, et, si l'outil de génération de fichiers est disponible dans la session, un **fichier `.xlsx` téléchargeable** en complément ;
+7. **produit une analyse complète** : un verdict (🟢/🟡/🔴) par bien selon des règles fixes, et une recommandation de synthèse croisée avec le contexte INSEE.
 
 ## Installation
 
@@ -69,9 +70,17 @@ Les paramètres se combinent librement, dans n'importe quel ordre, en langage na
 | Frais de notaire | déduits de l'état du bien | 8 % ancien / 2,5 % neuf |
 | Taux de crédit | recherché sur le web, sinon 3,5 % | — |
 
-## Format de sortie
+## Trois livrables tabulaires
 
-19 colonnes séparées par des tabulations, sans ligne d'en-tête :
+Un bloc TSV brut de 19 colonnes est illisible tel quel dans une conversation — il ne devient exploitable qu'une fois collé dans un tableur. Le skill produit donc trois représentations complémentaires des mêmes données, jamais une seule à la place des autres.
+
+### 1. Tableau de synthèse (toujours, en premier)
+
+Un tableau Markdown compact — Bien, Surface, Prix, Loyer HC, Fiabilité, Rendement net, Cashflow, Verdict — trié par verdict puis rendement net décroissant, lisible immédiatement dans la conversation. Ce n'est pas fait pour être collé où que ce soit, c'est la vue de lecture.
+
+### 2. Bloc TSV complet (toujours, pour copier-coller)
+
+19 colonnes séparées par des tabulations, **avec une ligne d'en-tête** :
 
 | # | Colonne | # | Colonne |
 |---|---------|---|---------|
@@ -86,9 +95,9 @@ Les paramètres se combinent librement, dans n'importe quel ordre, en langage na
 | 9 | Mensualité 25 ans (€) | 19 | Lien annonce |
 | 10 | Loyer HC (€) | | |
 
-Une ligne d'en-tête prête à coller est fournie dans [`examples/en-tetes.tsv`](examples/en-tetes.tsv).
+Un modèle d'en-têtes seul, pour qui veut le coller séparément, reste fourni dans [`examples/en-tetes.tsv`](examples/en-tetes.tsv).
 
-### La colonne « Fiabilité loyer »
+#### La colonne « Fiabilité loyer »
 
 Le loyer est la variable qui pèse le plus sur le rendement, et c'est aussi la plus incertaine. La colonne 11 dit d'où vient le chiffre :
 
@@ -99,6 +108,10 @@ Le loyer est la variable qui pèse le plus sur le rendement, et c'est aussi la p
 | `Estimation marché` | Extrapolation depuis un prix moyen au m² | À vérifier |
 
 Une ligne `Estimation marché` peut se tromper d'un point de rendement dans un sens comme dans l'autre. Le skill cite les annonces comparables utilisées pour les lignes `Annonce réelle`, ce qui permet de contrôler le raisonnement.
+
+### 3. Fichier Excel (si l'outil est disponible)
+
+Quand l'environnement dispose d'un outil de génération de fichiers, un classeur `.xlsx` est généré en complément : feuille « Biens » (19 colonnes + une 20ᵉ colonne Verdict avec mise en forme conditionnelle, en-tête figé) et feuille « Contexte marché » (bloc INSEE). C'est un complément, jamais un remplacement des deux livrables ci-dessus — si l'outil n'est pas disponible, le skill continue normalement sans lui, sans le signaler comme un manque.
 
 ## Contexte marché (INSEE)
 
@@ -117,7 +130,7 @@ Le **taux d'effort locatif** (loyer ÷ revenu médian du ménage) situe le loyer
 
 ## Analyse et verdicts
 
-Au-delà du tableau, le skill livre une analyse structurée : chaque bien reçoit un verdict selon des règles fixes, pas une impression qualitative.
+Chaque bien reçoit un verdict selon des règles fixes, pas une impression qualitative — déjà visible dans le tableau de synthèse (voir plus haut), puis repris ici avec sa justification :
 
 | Verdict | Condition |
 |---------|-----------|

@@ -35,15 +35,30 @@ Contexte marché — Angers (INSEE)
 
 Lecture : ville en croissance démographique, parc majoritairement locatif — le contexte est structurellement favorable à la demande locative. Mais le taux d'effort de 38,2 % dépasse le seuil d'alerte de 33 % : les loyers du neuf, pour cette gamme de biens, sont déjà tendus par rapport au revenu médian local. La marge de revalorisation des loyers y est donc faible, ce qui pèse directement sur les rendements ci-dessous.
 
-## Sortie — bloc à coller (19 colonnes)
+## Tableau de synthèse (Étape 5.1 — lecture immédiate)
+
+Trié par verdict puis rendement net décroissant — les trois biens tombent dans la même catégorie :
+
+| Bien | Surface | Prix | Loyer HC | Fiabilité | Rendement net | Cashflow 25 ans | Verdict |
+|------|---------|------|----------|-----------|-----------------|--------------------|---------|
+| T3 neuf Monplaisir 60 m² | 60 m² | 159 000 € | 670 € | Réelle | 3,9 % | −183 € | 🔴 |
+| T3 neuf Belle-Beille 58 m² | 58 m² | 172 000 € | 690 € | Réelle | 3,3 % | −287 € | 🔴 |
+| T3 neuf Saint-Serge 62 m² | 62 m² | 186 000 € | 720 € | Estimé | 3,2 % | −343 € | 🔴 |
+
+## Sortie — bloc à coller (Étape 5.2 — 19 colonnes, avec en-tête)
 
 ```
+Ville	Adresse / Description	Surface (m²)	Prix achat (€)	Frais notaire (€)	Coût total (€)	Emprunt nécessaire (€)	Mensualité 20 ans (€)	Mensualité 25 ans (€)	Loyer HC (€)	Fiabilité loyer	Charges copro /mois (€)	Taxe foncière /mois (€)	Assurance PNO /mois (€)	Vacance loc. /mois (€)	Rendement brut (%)	Rendement net (%)	Cashflow /mois 25 ans (€)	Lien annonce
 Angers	T3 neuf Saint-Serge 62 m²	62	186000	4650	190650	170650	981	845	720	Estimation marché	85	55	18	60	4.6	3.2	-343	https://exemple.invalid/annonce/an-001
 Angers	T3 neuf Belle-Beille 58 m²	58	172000	4300	176300	156300	898	774	690	Annonce réelle	78	50	17	58	4.8	3.3	-287	https://exemple.invalid/annonce/an-002
 Angers	T3 neuf Monplaisir 60 m²	60	159000	3975	162975	142975	822	708	670	Annonce réelle	72	0	17	56	5.1	3.9	-183	https://exemple.invalid/annonce/an-003
 ```
 
 Version fichier : [`sortie-t3-neuf.tsv`](sortie-t3-neuf.tsv)
+
+## Fichier Excel (Étape 5.3 — si l'outil est disponible)
+
+Dans cette session, l'outil de génération de fichiers **n'est pas disponible** : le skill continue avec les seuls livrables 5.1 et 5.2, sans mentionner d'absence ni s'en excuser — c'est le comportement attendu, pas une dégradation à signaler.
 
 ## Points d'attention propres au neuf
 

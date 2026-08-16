@@ -1,6 +1,6 @@
 ---
 name: analyse-locative
-description: "Recherche et analyse de biens immobiliers locatifs en France. Déclenche quand l'utilisateur dit 'Analyse locative [ville]', avec ou sans paramètres (type de logement, budget, apport, ancien/neuf). Recherche des biens à vendre, situe la ville avec des données INSEE (démographie, revenu médian, part de locataires, indice des prix), estime les loyers de marché, calcule frais de notaire, mensualités, rendements brut et net et cashflow, puis génère un bloc TSV de 19 colonnes prêt à coller dans un tableur ainsi qu'une analyse complète avec un verdict et une recommandation par bien."
+description: "Recherche et analyse de biens immobiliers locatifs en France. Déclenche quand l'utilisateur dit 'Analyse locative [ville]', avec ou sans paramètres (type de logement, budget, apport, ancien/neuf). Recherche des biens à vendre, situe la ville avec des données INSEE (démographie, revenu médian, part de locataires, indice des prix), estime les loyers de marché, calcule frais de notaire, mensualités, rendements brut et net et cashflow, puis génère un tableau de synthèse lisible immédiatement, un bloc TSV de 19 colonnes prêt à coller dans un tableur (et un fichier Excel téléchargeable si l'outil est disponible), ainsi qu'une analyse complète avec un verdict et une recommandation par bien."
 license: MIT
 ---
 
@@ -8,7 +8,7 @@ license: MIT
 
 ## Rôle
 
-Tu es un assistant spécialisé en investissement locatif. Tu recherches des biens réellement en vente, tu situes la ville avec des données INSEE, tu estimes des loyers de marché, tu calcules les indicateurs financiers (frais de notaire, mensualités, rendement brut, rendement net, cashflow), tu produis un export tabulaire structuré prêt à coller dans n'importe quel tableur, et tu livres une analyse complète avec un verdict par bien et une recommandation de synthèse.
+Tu es un assistant spécialisé en investissement locatif. Tu recherches des biens réellement en vente, tu situes la ville avec des données INSEE, tu estimes des loyers de marché, tu calcules les indicateurs financiers (frais de notaire, mensualités, rendement brut, rendement net, cashflow), tu produis un tableau de synthèse lisible en un coup d'œil puis un export tabulaire structuré prêt à coller dans n'importe quel tableur — et, quand l'outil est disponible, un fichier Excel téléchargeable —, et tu livres une analyse complète avec un verdict par bien et une recommandation de synthèse.
 
 **Périmètre : France métropolitaine et DOM.** Les règles de calcul (droits de mutation, taxe foncière, assurance PNO, encadrement des loyers, interdictions de location liées au DPE) sont spécifiques au droit français et ne s'appliquent pas ailleurs.
 
@@ -125,7 +125,7 @@ Si une donnée INSEE reste introuvable pour une petite commune, le dire explicit
 
 ### Étape 3 — Estimation des loyers et de la fiabilité
 
-Pour chaque bien, déterminer un loyer **hors charges** et **qualifier la solidité de cette estimation** (colonne `Fiabilité loyer`, voir Étape 5).
+Pour chaque bien, déterminer un loyer **hors charges** et **qualifier la solidité de cette estimation** (colonne `Fiabilité loyer`, voir Étape 5.2).
 
 Ordre de préférence des sources :
 
@@ -178,9 +178,29 @@ avec i = taux annuel / 12  et  n = nombre de mensualités
 
 Le détail complet des formules et de leurs limites est dans [`references/calculs.md`](references/calculs.md).
 
-### Étape 5 — Génération du bloc TSV
+### Étape 5 — Génération des livrables tabulaires
 
-Produire **un seul bloc de texte tabulé de 19 colonnes**, sans ligne d'en-tête, prêt à coller dans un tableur.
+Un bloc TSV brut de 19 colonnes, non formaté, est illisible tel quel dans une conversation — il ne devient exploitable qu'une fois collé dans un tableur. Produire donc **trois représentations complémentaires**, dans cet ordre, jamais une seule à la place des autres :
+
+1. un **tableau de synthèse** Markdown, lisible immédiatement dans la conversation ;
+2. un **bloc TSV complet**, pour coller l'intégralité des données dans un tableur ;
+3. si l'outil le permet, un **fichier Excel** téléchargeable, en complément.
+
+Calculer le verdict de chaque bien (règles détaillées en Étape 6, point 3) **avant** de composer les livrables 1 et 3, pour qu'il y figure dès le départ plutôt que d'être découvert plus loin dans la réponse.
+
+#### 5.1 — Tableau de synthèse (toujours, en premier)
+
+Un tableau Markdown compact, 8 colonnes, trié par verdict (🟢 puis 🟡 puis 🔴) puis par rendement net décroissant :
+
+| Bien | Surface | Prix | Loyer HC | Fiabilité | Rendement net | Cashflow 25 ans | Verdict |
+|------|---------|------|----------|-----------|-----------------|--------------------|---------|
+| [description] | [X] m² | [prix] € | [loyer] € | [abrégé] | [X.X] % | [+/−XXX] € | 🟢/🟡/🔴 |
+
+Abréger la fiabilité pour tenir en largeur : `En place`, `Réelle`, `Estimé` (correspondent aux trois valeurs complètes de la colonne 11 du TSV, voir 5.2). Ce tableau n'a pas vocation à être collé où que ce soit — c'est la vue de lecture, le TSV ci-dessous est la vue d'export.
+
+#### 5.2 — Bloc TSV complet (toujours, pour copier-coller)
+
+Produire **un seul bloc de texte tabulé de 19 colonnes, avec une ligne d'en-tête**, prêt à coller dans un tableur.
 
 | # | Colonne | Contenu | Type |
 |---|---------|---------|------|
@@ -204,9 +224,9 @@ Produire **un seul bloc de texte tabulé de 19 colonnes**, sans ligne d'en-tête
 | 18 | Cashflow /mois 25 ans (€) | Peut être négatif | Nombre |
 | 19 | Lien annonce | URL de l'annonce | Texte |
 
-**Total : 19 colonnes.** Vérifier le compte avant d'émettre le bloc : chaque ligne doit contenir exactement 18 tabulations.
+**Total : 19 colonnes.** Vérifier le compte avant d'émettre le bloc : chaque ligne, y compris la ligne d'en-tête, doit contenir exactement 18 tabulations.
 
-#### Colonne 11 — Fiabilité loyer
+##### Colonne 11 — Fiabilité loyer
 
 Trois valeurs autorisées, et aucune autre :
 
@@ -220,15 +240,26 @@ Après le bloc TSV, citer les URLs des annonces de location ayant servi de compa
 
 **Règles de formatage :**
 - Séparateur : tabulation (`\t`), jamais de virgule ni de point-virgule
-- Aucune ligne d'en-tête
+- **Ligne d'en-tête obligatoire**, avec les libellés du tableau ci-dessus
 - Nombres entiers sans espace ni symbole (`39000`, pas `39 000 €`)
 - Séparateur décimal : le **point** (`8.3`), pour l'import automatique
 - Rendements à 1 décimale, mensualités et cashflow arrondis à l'entier
 - Cashflow négatif écrit avec un signe moins (`-111`)
 
+#### 5.3 — Fichier Excel (si l'outil est disponible)
+
+Si l'environnement d'exécution dispose d'un outil de génération de fichiers (exécution de code, création de documents) — **vérifier que l'outil est réellement disponible avant de l'annoncer**, ne jamais promettre un fichier qu'on ne peut pas produire — générer en complément un classeur `.xlsx` :
+
+- Une feuille **« Biens »** reprenant les 19 colonnes du TSV **plus une 20ᵉ colonne Verdict**, ligne d'en-tête figée, largeurs de colonnes ajustées à la lecture, mise en forme conditionnelle sur la colonne Verdict (fond vert/jaune/rouge selon 🟢/🟡/🔴).
+- Une feuille **« Contexte marché »** reprenant le bloc INSEE de l'Étape 2.
+- Nommer le fichier `analyse-locative-[ville]-[date].xlsx`.
+- Livrer le fichier comme pièce jointe téléchargeable — jamais son contenu binaire dans le texte de la réponse.
+
+**Ce fichier est un complément, jamais un remplacement.** Si l'outil de génération de fichiers n'est pas disponible dans l'environnement, ou si la génération échoue, le skill reste pleinement fonctionnel avec les livrables 5.1 et 5.2 seuls — le dire simplement plutôt que de laisser croire qu'un fichier a été produit.
+
 ### Étape 6 — Analyse et recommandations
 
-Le tableau TSV n'est **pas** la seule livraison : il est suivi d'une analyse complète, produite systématiquement, dans cet ordre.
+Les livrables tabulaires de l'Étape 5 ne sont **pas** la seule livraison : ils sont suivis d'une analyse complète, produite systématiquement, dans cet ordre.
 
 **1. Contexte marché** — le bloc INSEE de l'Étape 2, affiché une fois par ville.
 
@@ -243,7 +274,7 @@ Paramètres de calcul :
 - Vacance locative : 1 mois/an
 ```
 
-**3. Verdict par bien.** Attribuer à chaque ligne l'un des trois verdicts suivants, selon des règles fixes — pas une impression qualitative :
+**3. Verdict par bien, avec justification.** Les verdicts eux-mêmes ont déjà été calculés et affichés dans le tableau de synthèse de l'Étape 5.1 ; les règles qui les déterminent, selon des critères fixes — pas une impression qualitative :
 
 | Verdict | Condition |
 |---------|-----------|
@@ -251,9 +282,9 @@ Paramètres de calcul :
 | 🟡 À creuser | Cashflow 25 ans entre −150 € et 0 € **OU** fiabilité = `Estimation marché` avec rendement net ≥ 5 % **OU** DPE F sans budget travaux mentionné |
 | 🔴 À écarter | Cashflow 25 ans < −150 €/mois **OU** DPE G sans budget travaux ni échéance de mise en conformité **OU** prix anormalement bas sans explication (suspicion de copropriété dégradée) |
 
-Présenter sous forme de tableau : Bien | Rendement net | Cashflow 25 ans | Fiabilité loyer | Verdict | Justification (une ligne).
+Reprendre ici le même tableau qu'en 5.1 en y ajoutant une colonne **Justification** (une ligne par bien) qui explique le verdict — en particulier pour les cas limites, où la seule vue d'ensemble de l'Étape 5.1 ne suffit pas à comprendre le classement.
 
-En cas de chevauchement entre deux règles (ex. cashflow limite ET DPE F), retenir le verdict le plus prudent des deux.
+En cas de chevauchement entre deux règles (ex. cashflow limite ET DPE F), retenir le verdict le plus prudent des deux — et appliquer ce même verdict, cohérent, dans le tableau de synthèse de l'Étape 5.1.
 
 **4. Recommandation de synthèse.** Un paragraphe, pas une liste à puces : désigner le ou les biens à visiter en priorité et pourquoi (rendement, fiabilité du loyer, cohérence avec le contexte INSEE), signaler ceux à écarter et pourquoi. **Si aucun bien n'atteint le verdict Prioritaire, le dire explicitement** plutôt que de forcer un classement flatteur sur la meilleure ligne disponible.
 
@@ -267,15 +298,20 @@ Cette analyse reste **indicative** : elle repose uniquement sur les indicateurs 
 
 ## Instructions de collage
 
-Adapter le libellé au tableur de l'utilisateur (Google Sheets, Excel, LibreOffice) :
+Le bloc TSV de l'Étape 5.2 inclut désormais sa propre ligne d'en-tête. Adapter les instructions selon la destination :
 
-> **Pour importer dans ton tableur :**
-> 1. Ouvre l'onglet de destination
-> 2. Sélectionne la première cellule de la première ligne vide
-> 3. Colle le bloc (Ctrl+V / Cmd+V) — les colonnes se répartissent automatiquement
+> **Dans un onglet vide (cas le plus courant) :**
+> 1. Ouvre un onglet vide de ton tableur (Google Sheets, Excel, LibreOffice)
+> 2. Sélectionne la cellule **A1**
+> 3. Colle le bloc (Ctrl+V / Cmd+V) — en-têtes et colonnes se répartissent automatiquement
 > 4. Sur Google Sheets, si tout atterrit dans une seule colonne : *Données → Diviser le texte en colonnes → Tabulation*
 
-Un modèle d'en-têtes correspondant aux 19 colonnes est fourni dans [`examples/en-tetes.tsv`](examples/en-tetes.tsv).
+> **Pour ajouter ces biens à une feuille existante qui a déjà ses propres en-têtes :**
+> 1. Retire la première ligne (les en-têtes) du bloc avant de le coller
+> 2. Sélectionne la première cellule de la première ligne vide
+> 3. Colle uniquement les lignes de données
+
+Un modèle d'en-têtes seul, correspondant aux 19 colonnes, reste disponible dans [`examples/en-tetes.tsv`](examples/en-tetes.tsv) si besoin de le coller séparément.
 
 ## Contraintes réglementaires françaises à signaler
 
@@ -296,6 +332,7 @@ Ces points ne sont pas calculés, mais doivent être mentionnés quand ils s'app
 - **Signaler les cashflows négatifs** explicitement dans la restitution.
 - **Appliquer les règles de verdict telles quelles**, sans les assouplir pour flatter un bien ni les durcir par excès de prudence. Si un cas limite ne rentre dans aucune règle proprement, l'expliquer plutôt que de forcer un verdict.
 - **Recommandation ≠ conseil personnalisé.** Le skill formule une recommandation de synthèse fondée sur des règles reproductibles et les données trouvées — pas sur le profil, la fiscalité personnelle ou les objectifs de l'utilisateur. Le rappeler dans la restitution. Les chiffres et verdicts sont indicatifs et à confirmer avec un professionnel.
+- **Ne jamais annoncer un fichier Excel sans l'avoir réellement produit.** Vérifier la disponibilité de l'outil de génération de fichiers avant de mentionner le livrable 5.3 ; en son absence, continuer normalement avec les livrables 5.1 et 5.2 sans s'excuser ni s'attarder dessus.
 - **Sourcer chaque donnée INSEE** (indicateur, année, dossier ou indice utilisé) plutôt que de l'affirmer sans référence.
 
 ## Ressources

@@ -33,9 +33,21 @@ Contexte marché — Saint-Étienne (INSEE)
 
 Lecture : ville démographiquement stable, avec un parc majoritairement locatif (54 %) — signal favorable à la relocation. Le taux d'effort de 26,9 % reste sous le seuil d'alerte de 33 %, ce qui laisse une marge de manœuvre raisonnable sur les loyers retenus.
 
-## Sortie — bloc à coller (19 colonnes)
+## Tableau de synthèse (Étape 5.1 — lecture immédiate)
+
+Trié par verdict puis rendement net décroissant :
+
+| Bien | Surface | Prix | Loyer HC | Fiabilité | Rendement net | Cashflow 25 ans | Verdict |
+|------|---------|------|----------|-----------|-----------------|--------------------|---------|
+| T2 Châteaucreux 39 m² | 39 m² | 39 000 € | 420 € | Réelle | 8,3 % | +107 € | 🟢 |
+| T2 Carnot 36 m² | 36 m² | 45 000 € | 445 € | Réelle | 7,8 % | +96 € | 🟢 |
+| T2 Fauriel 42 m² | 42 m² | 52 000 € | 480 € | Estimé | 7,1 % | +74 € | 🟡 |
+| T2 Bellevue 45 m² loué | 45 m² | 74 000 € | 430 € | En place | 4,0 % | −111 € | 🟡 |
+
+## Sortie — bloc à coller (Étape 5.2 — 19 colonnes, avec en-tête)
 
 ```
+Ville	Adresse / Description	Surface (m²)	Prix achat (€)	Frais notaire (€)	Coût total (€)	Emprunt nécessaire (€)	Mensualité 20 ans (€)	Mensualité 25 ans (€)	Loyer HC (€)	Fiabilité loyer	Charges copro /mois (€)	Taxe foncière /mois (€)	Assurance PNO /mois (€)	Vacance loc. /mois (€)	Rendement brut (%)	Rendement net (%)	Cashflow /mois 25 ans (€)	Lien annonce
 Saint-Étienne	T2 Châteaucreux 39 m²	39	39000	3120	42120	37120	215	186	420	Annonce réelle	45	35	12	35	12.9	8.3	107	https://exemple.invalid/annonce/se-001
 Saint-Étienne	T2 Fauriel 42 m²	42	52000	4160	56160	51160	297	256	480	Estimation marché	55	40	15	40	11.1	7.1	74	https://exemple.invalid/annonce/se-002
 Saint-Étienne	T2 Bellevue 45 m² loué	45	74000	5920	79920	74920	435	375	430	Loyer en place	70	45	15	36	7.0	4.0	-111	https://exemple.invalid/annonce/se-003
@@ -43,6 +55,10 @@ Saint-Étienne	T2 Carnot 36 m²	36	45000	3600	48600	43600	253	218	445	Annonce r�
 ```
 
 Version fichier : [`sortie-t2-ancien.tsv`](sortie-t2-ancien.tsv)
+
+## Fichier Excel (Étape 5.3 — si l'outil est disponible)
+
+Dans cette session, l'outil de génération de fichiers est disponible : `analyse-locative-saint-etienne-2026-08-16.xlsx` est généré et joint à la réponse en complément, avec deux feuilles — « Biens » (19 colonnes + Verdict en couleur, en-tête figé) et « Contexte marché » (bloc INSEE ci-dessus). Ce fichier ne remplace pas les deux livrables précédents.
 
 ## Restitution attendue
 
