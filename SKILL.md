@@ -14,19 +14,75 @@ Tu es un expert en finance d'entreprise et en stratégie. Tu analyses les entrep
 
 Quand l'utilisateur demande "Analyse [entreprise]", suivre ce workflow :
 
-1. **Collecter les données** via web search sur des sources fiables (rapports annuels, Boursorama, Zonebourse, Morningstar, Vernimmen, sites officiels). Les données internet sont TOUJOURS plus fiables que tes calculs internes.
+1. **Étape 0 — Collecter et vérifier les données** (ci-dessous). Ne jamais entamer les calculs sur des données non vérifiées.
 2. **Appliquer les 8 étapes** séquentiellement — chaque étape produit des indicateurs et une interprétation.
-3. **Produire un artefact** (fichier markdown ou HTML) contenant l'analyse complète.
-4. **Executive Summary** en tête du document avec les conclusions clés.
-5. **PER et PBR** — si l'entreprise est cotée, toujours calculer et analyser ces multiples.
+3. **Passer les contrôles de cohérence** (section dédiée ci-dessous) — **avant** d'écrire l'Étape 6 et la restitution.
+4. **Produire un artefact** (fichier markdown ou HTML) contenant l'analyse complète.
+5. **Executive Summary** en tête du document avec les conclusions clés.
+6. **PER et PBR** — si l'entreprise est cotée, toujours calculer et analyser ces multiples.
 
-## Principes de collecte de données
+## Étape 0 — Collecte et vérification des données
 
-- Privilégier web search (pas de firecrawl) pour économiser les tokens.
-- Chercher en français pour les entreprises européennes (meilleurs résultats).
-- Croiser plusieurs sources pour fiabiliser les chiffres.
-- Récupérer au minimum 2 à 3 années de données pour voir les tendances.
-- Sources prioritaires : rapport annuel officiel > Boursorama/Zonebourse > Morningstar > presse financière.
+Cette étape n'est pas un préliminaire optionnel : **la quasi-totalité des erreurs d'un diagnostic financier vient d'un input faux, pas d'un calcul faux.** Un chiffre erroné en entrée se propage silencieusement dans 5 étapes en aval sans qu'aucune ne le conteste.
+
+### 0.1 — Hiérarchie des sources
+
+| Niveau | Sources | Usage |
+|---|---|---|
+| **1 — Primaire officielle** | Comptes sociaux déposés au greffe (PDF complet : bilan, compte de résultat, **annexe**, rapport du commissaire aux comptes) via [data.inpi.fr](https://data.inpi.fr) (RNE, gratuit, officiel), Pappers ou Infogreffe. Pour les cotées : URD / rapport annuel, communiqués AMF | **La seule source qui tranche.** Seul niveau donnant le détail poste par poste |
+| **2 — Agrégateurs** | Pappers, Societe.com, Infonet | Point d'entrée normal. Republient le niveau 1 avec des ratios pré-calculés (BFR, EBITDA, CAF, ROE) — précieux, mais **agrégés** : le détail disparaît |
+| **3 — Marché et presse** | Boursorama, Zonebourse, presse financière | Cours, bêta, capitalisation, transactions, contexte. Indispensable — ces données n'existent pas dans les comptes sociaux |
+| **4 — Communication de l'entreprise** | Site institutionnel, communiqués | Contexte qualitatif **uniquement**. Un « 200+ consultants » affiché sur un site est du marketing, jamais une donnée d'effectif — ne pas le mélanger avec l'INSEE |
+
+Chercher en français pour les entreprises françaises et européennes. Récupérer au minimum 2 à 3 exercices pour dégager une tendance.
+
+**Réserve à connaître** : les petites entreprises peuvent demander la **confidentialité** de leurs comptes déposés. Pour une micro-entreprise, le détail peut simplement ne pas exister publiquement — c'est une réponse valide, pas un échec de recherche.
+
+### 0.2 — Un rapport de recherche délégué est une piste, pas une source
+
+Si la collecte a été déléguée (sous-agent, recherche automatisée, synthèse d'un tiers), son rapport indique **où chercher**, il ne constitue pas la donnée. Les **inputs critiques** — ceux qui alimentent trois étapes ou plus — doivent être confirmés sur la page ou le document source avant d'entrer dans un calcul :
+
+> **CA · EBIT · EBITDA · Capitaux propres · Dette financière · Trésorerie · Immobilisations nettes**
+
+Les autres données peuvent rester au niveau du rapport, à condition d'être étiquetées comme telles (§ 0.4).
+
+**Piège classique, à vérifier explicitement** : au passif d'un bilan français, la ligne `TOTAL DETTES` agrège dettes financières **et** dettes d'exploitation (fournisseurs, fiscales et sociales, produits constatés d'avance). La dette financière, ce sont uniquement les lignes `Emprunts obligataires`, `Emprunts et dettes auprès des établissements de crédit` et `Emprunts et dettes financières divers`. Confondre les deux fausse le gearing, les capitaux employés, le WACC, l'EVA et la valorisation d'un seul coup.
+
+### 0.3 — Le chiffre publié prime sur le chiffre recalculé
+
+Si une source publie directement un indicateur (BFR, EBITDA, CAF, ROE, délais de paiement), **retenir son chiffre**. Ne recalculer que pour contrôler — et si l'écart dépasse 5 %, ne pas trancher arbitrairement : appliquer la règle d'escalade (§ 0.5).
+
+Reconstruire un indicateur à partir de composants partiels donne un résultat faux dès qu'un composant manque. Un BFR reconstitué à partir des seuls postes clients et fournisseurs ignore les dettes fiscales et sociales, souvent massives dans les sociétés de services — et peut se tromper d'un facteur 3.
+
+### 0.4 — Traçabilité et propagation de l'incertitude
+
+Chaque donnée porte un statut :
+
+| Statut | Signification |
+|---|---|
+| `vérifié-source` | Confirmé sur le document ou la page source primaire |
+| `secondaire` | Vient d'un agrégateur ou d'un rapport délégué, non re-vérifié |
+| `estimé` | Proxy ou hypothèse — la méthode de calcul doit être explicitée sur place |
+| `non-trouvé` | Recherché sans succès |
+
+**Règle de propagation : tout indicateur dérivé hérite du statut le plus faible de ses inputs.** Un ROIC calculé à partir d'une dette `secondaire` est un ROIC `secondaire`, et l'EVA qui en découle aussi — jusque dans l'Executive Summary. Le lecteur doit voir où l'analyse est fragile sans avoir à le deviner.
+
+**« Je n'ai pas trouvé » n'est pas « ça n'existe pas ».** Ne jamais écrire qu'une donnée est indisponible publiquement sans avoir consulté la source primaire — c'est une affirmation sur le monde, pas une précaution de langage.
+
+### 0.5 — Doctrine d'escalade vers la source primaire
+
+Ne pas télécharger les comptes complets systématiquement (coûteux), ne jamais s'en priver non plus. **Escalader sur déclencheur :**
+
+| Déclencheur | Action |
+|---|---|
+| Un contrôle de cohérence échoue | **Escalade obligatoire** — on ne documente pas l'écart, on va chercher la donnée |
+| Deux sources de niveau 2 divergent | **Escalade obligatoire** |
+| Un chiffre est structurellement invraisemblable (§ contrôles, test de plausibilité) | **Escalade obligatoire** |
+| Un input critique manque, ou n'existe qu'en agrégat | Escalade |
+| Un poste n'existe que dans le détail : D&A, charges financières, immobilisations brutes/nettes, échéancier des dettes, taux d'IS effectif | Escalade |
+| Tout est cohérent, recoupé et suffisant pour les calculs | **Rester au niveau 2** — c'est légitime |
+
+**Dans un jeu de comptes complets, l'annexe vaut souvent plus que les tableaux chiffrés.** C'est elle qui révèle les malis de fusion, les conventions de trésorerie intragroupe (cash pooling), l'intégration fiscale, les engagements hors bilan et les transactions avec parties liées — autant d'éléments qui changent l'interprétation et qu'aucun tableau de synthèse ne montre.
 
 ## Les 8 Étapes
 
@@ -154,6 +210,47 @@ Pour les formules détaillées et les seuils d'interprétation de chaque étape,
 - Émettre une recommandation : BUY / HOLD / SELL avec prix cible.
 - Analyse de scénarios : Bull / Base / Bear.
 
+## Contrôles de cohérence
+
+Les 8 étapes s'enchaînent en cascade : l'actif économique alimente le ROIC, la structure de financement alimente le WACC, les deux alimentent l'EVA puis la valorisation. **Un input faux ne se signale jamais tout seul** — il produit des résultats plausibles jusqu'au bout. Ces contrôles sont le seul mécanisme qui le détecte.
+
+**Quand les exécuter** : après les Étapes 1 à 5 (dès que bilan et compte de résultat sont exploités), **avant** d'écrire les Étapes 6 à 8 et la restitution — c'est là que la cascade démarre.
+
+### Contrôles d'identité comptable
+
+| # | Contrôle | Tolérance |
+|---|---|---|
+| C1 | **Actif économique** (BFR total + immobilisations nettes) **= Capitaux employés** (capitaux propres + provisions + dette financière nette) | écart < 5 % |
+| C2 | **Capitaux propres + total des dettes + provisions = total du bilan** | à l'euro près |
+| C3 | **EBITDA − dotations aux amortissements et provisions = EBIT** | à l'euro près |
+| C4 | **ROE recalculé** (résultat net / capitaux propres) **= ROE publié** par la source | écart < 0,5 pt |
+| C5 | Si dette financière = 0 : **gearing = 0 et charges d'intérêts ≈ 0** — sinon l'un des deux est faux | cohérence logique |
+| C6 | **Taux d'IS effectif** (impôt / résultat courant avant impôts) **dans une fourchette plausible** (≈ 15 % à 35 % en France) | sinon investiguer (intégration fiscale, CIR, déficits reportables) |
+
+### Tests de plausibilité structurelle
+
+Vérifier que le profil de bilan correspond au modèle d'activité. Une violation n'est pas forcément une erreur, mais **exige une explication documentée** :
+
+| Modèle | Attendu | Alerte si |
+|---|---|---|
+| **Services / conseil** | Stocks ≈ 0 · immobilisations corporelles faibles · masse salariale 50-75 % du CA · **dettes fiscales et sociales significatives** (plusieurs mois de charges) | Dettes sociales quasi nulles alors que la masse salariale est importante → **la ventilation du passif est fausse** |
+| **Distribution** | BFR négatif · rotation d'actif élevée · marge faible | BFR fortement positif → modèle atypique à expliquer |
+| **Industrie** | Immobilisations lourdes · stocks significatifs · intensité capitalistique élevée | Immobilisations faibles → activité sous-traitée ? |
+
+**Test de bon sens à appliquer systématiquement** : reconstituer mentalement les postes manquants et vérifier qu'ils sont possibles. Exemple : si capitaux propres + dette financière ≈ total du bilan, alors toutes les autres dettes valent zéro — impossible pour une entreprise qui paie des salaires et de la TVA. Ce raisonnement seul suffit à détecter une ventilation de passif erronée.
+
+### En cas d'échec d'un contrôle
+
+**Un contrôle qui échoue est une donnée fausse, pas une curiosité à commenter.**
+
+1. **Ne pas documenter l'écart et poursuivre.** C'est le réflexe naturel et c'est l'erreur : expliquer pourquoi deux chiffres divergent ne les rend pas justes.
+2. **Escalader vers la source primaire** (§ 0.5) pour récupérer la donnée manquante ou corrigée.
+3. Si, après escalade, la donnée reste introuvable : **le dire explicitement, marquer les indicateurs dérivés comme `estimé`** (§ 0.4), et propager cette réserve jusqu'à l'Executive Summary. Ne jamais présenter comme établi un résultat dont un input est incertain.
+
+### Restitution des contrôles
+
+Faire figurer dans l'artefact une section **« Contrôles de cohérence »** listant chaque contrôle avec son résultat (✓ / ✗ / non applicable) et les chiffres du rapprochement. Deux bénéfices : le lecteur vérifie que les contrôles ont réellement tourné, et il devient impossible de les contourner silencieusement.
+
 ## Structure de l'artefact de sortie
 
 Produire un fichier markdown structuré ainsi :
@@ -162,8 +259,17 @@ Produire un fichier markdown structuré ainsi :
 # Analyse Financière — [Nom de l'entreprise]
 ## Date de l'analyse : [date]
 
+## Fiabilité des données
+[Tableau : donnée → statut (vérifié-source / secondaire / estimé / non-trouvé) + source]
+[Signaler ici toute donnée critique non vérifiée directement]
+
 ## Executive Summary
 [3-5 bullets avec les conclusions clés : santé financière, création/destruction de valeur, valorisation, recommandation]
+[Chaque conclusion reposant sur une donnée `estimé` ou `secondaire` doit le mentionner]
+
+## Contrôles de cohérence
+[C1 à C6 : ✓ / ✗ / n.a., avec les chiffres du rapprochement]
+[Tests de plausibilité structurelle : conforme au modèle d'activité ? écarts expliqués ?]
 
 ## 1. Analyse de la marge
 [Tableaux + interprétation]
@@ -197,10 +303,13 @@ Produire un fichier markdown structuré ainsi :
 
 - **Toujours chercher les données sur internet avant de calculer.** Les données publiées sont plus fiables que les estimations.
 - **Ne jamais inventer de chiffres.** Si une donnée est introuvable, le signaler et utiliser un proxy raisonnable en le justifiant.
+- **Vérifier les inputs critiques à la source** (§ 0.2). Un rapport de recherche délégué oriente vers la source, il ne la remplace pas.
+- **Ne jamais contourner un contrôle de cohérence en l'expliquant.** Si deux chiffres qui devraient converger divergent, la donnée est fausse — il faut aller la chercher, pas rédiger une note de bas de page.
+- **Propager l'incertitude** jusqu'à l'Executive Summary (§ 0.4). Un résultat calculé sur un input `estimé` reste `estimé`, quel que soit le soin du calcul.
 - **Toujours interpréter les chiffres**, pas juste les afficher. Chaque ratio doit être accompagné d'un commentaire sur ce qu'il signifie pour l'entreprise.
 - **Comparer systématiquement** aux pairs du secteur quand les données sont disponibles.
 - **PER et PBR obligatoires** pour toute entreprise cotée.
-- **Privilégier web search** plutôt que firecrawl pour économiser les tokens.
+- **Privilégier web search** plutôt que firecrawl pour économiser les tokens ; escalader vers les comptes déposés complets sur déclencheur (§ 0.5).
 - **Chercher en français** pour les entreprises françaises/européennes.
 - **Ne constitue pas un conseil en investissement.** La recommandation BUY/HOLD/SELL produite par ce skill est une conclusion méthodologique fondée sur des données publiques et des hypothèses explicites (WACC, taux de croissance, comparables) — pas un conseil personnalisé. Le rappeler dans la synthèse et inviter à consulter un professionnel avant toute décision d'investissement réelle.
 
