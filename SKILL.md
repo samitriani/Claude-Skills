@@ -38,6 +38,8 @@ Chercher en français pour les entreprises françaises et européennes. Récupé
 
 **Réserve à connaître** : les petites entreprises peuvent demander la **confidentialité** de leurs comptes déposés. Pour une micro-entreprise, le détail peut simplement ne pas exister publiquement — c'est une réponse valide, pas un échec de recherche.
 
+**Piège central : comptes sociaux ≠ comptes consolidés.** Pappers, Societe.com et Infogreffe donnent les **comptes sociaux** — l'entité juridique française isolée. Pour une PME/ETI à entité unique (le cas le plus courant), c'est exactement ce qu'il faut. **Pour un groupe qui a des filiales** (a fortiori un grand groupe coté), chercher le nom de la société sur ces sites renvoie souvent les comptes sociaux de la **société mère ou holding française** — une coquille juridique presque vide, puisque l'activité réelle est logée dans les filiales. Ce n'est pas juste incomplet, c'est **trompeur** : ces comptes existent, ont l'air normaux, et analysent la mauvaise entité sans le signaler. Dès que l'entreprise a des filiales consolidées, la source de niveau 1 devient les **comptes consolidés** du groupe (Document d'Enregistrement Universel pour une cotée française, rapport annuel sinon), pas les comptes sociaux de la maison mère. Vérifier en premier : cette entreprise a-t-elle des filiales significatives ? Si oui, chercher explicitement « comptes consolidés » ou « rapport annuel groupe », pas seulement le nom de l'entreprise sur un agrégateur.
+
 ### 0.2 — Un rapport de recherche délégué est une piste, pas une source
 
 Si la collecte a été déléguée (sous-agent, recherche automatisée, synthèse d'un tiers), son rapport indique **où chercher**, il ne constitue pas la donnée. Les **inputs critiques** — ceux qui alimentent trois étapes ou plus — doivent être confirmés sur la page ou le document source avant d'entrer dans un calcul :
@@ -99,6 +101,24 @@ Ne pas télécharger les comptes complets systématiquement (coûteux), ne jamai
 4. Le script retourne un code de sortie non nul si un contrôle échoue **ou** si plus de la moitié des contrôles sont inexécutables faute de données. Dans les deux cas : ne pas rédiger les Étapes 6 à 8 avant d'avoir résolu la cause (escalade, § 0.5).
 
 **Si l'exécution de code n'est pas disponible** (par exemple certains contextes Claude.ai) : appliquer les contrôles C1 à C6 et le test de plausibilité manuellement, avec la même discipline — un contrôle qui échoue s'escalade, il ne se documente pas. Le signaler explicitement dans l'artefact (« contrôles effectués manuellement, outil de calcul indisponible ») plutôt que de laisser croire que le script a tourné.
+
+### 0.7 — Adapter la méthode à la taille et à la structure de l'entreprise
+
+Les Étapes 0 à 8 ont été rodées sur des PME/ETI françaises à entité juridique unique (le cas le plus fréquent). Deux profils s'écartent nettement de ce cas par défaut et demandent une vigilance spécifique — les identités comptables (§ Contrôles de cohérence) restent valables partout, ce sont les **données d'entrée** et leur **lecture** qui changent.
+
+**Grand groupe consolidé (ex. Renault, L'Oréal) :**
+
+- **Comptes consolidés, pas comptes sociaux** (§ 0.1) — la source change de nature, pas seulement de taille.
+- **Intérêts minoritaires.** Si une filiale n'est pas détenue à 100 %, les capitaux propres consolidés se décomposent en « part du groupe » + « intérêts minoritaires », alors que le bilan consolidé inclut 100 % des actifs de la filiale. Utiliser les capitaux propres **totaux** (part du groupe + minoritaires) dans C1 — sinon le contrôle échoue pour une raison purement comptable, pas parce qu'une donnée est fausse. Si l'écart de C1 réapparaît toujours après ce redressement, alors seulement le traiter comme un vrai signal d'erreur (§ Contrôles de cohérence).
+- **Activité financière captive** (ex. Mobilize Financial Services chez Renault, filiales de financement chez les grands industriels) : une partie de la dette du groupe finance le crédit accordé aux clients, pas l'entreprise elle-même — ce n'est pas du levier au sens de l'Étape 4. Chercher si l'entreprise publie une décomposition sectorielle (« Automobile » / « Services financiers » ou équivalent) et appliquer gearing et dette/EBITDA à l'activité industrielle seule ; sinon, le signaler explicitement comme une limite plutôt que de publier un ratio consolidé trompeur.
+- **Goodwill et intangibles issus d'acquisitions.** Un groupe qui a beaucoup acquis (marques, entreprises) porte un goodwill souvent non amorti (test de dépréciation, pas d'amortissement linéaire sous IFRS depuis 2004). Il gonfle l'actif économique sans générer de dotation comparable à un actif industriel : un ROIC plus bas ne signale pas forcément une entreprise moins efficace opérationnellement, seulement une base d'actifs différente. Le mentionner dans l'interprétation de l'Étape 3 plutôt que de laisser le chiffre parler seul.
+- **Participations financières** (ex. une prise de participation minoritaire dans une autre société cotée) : à exclure de l'actif économique, même logique que la trésorerie exclue pour Thiga et OCTO — c'est un actif financier, pas un moyen d'exploitation.
+
+**Entité sans comptes publics accessibles (micro-entreprise, TPE avec confidentialité des comptes) :**
+
+- Une micro-entreprise (régime auto-entrepreneur) n'a pas de bilan au sens comptable — juste une déclaration de chiffre d'affaires. Le niveau 1 de la hiérarchie des sources n'existe pas, ce n'est pas une recherche insuffisante.
+- Une SARL/EURL en dessous des seuils peut avoir déposé des comptes sous option de confidentialité — légalement déposés, non publiés. Vérifier explicitement cette option avant de conclure à une absence de données (elle est mentionnée sur la fiche Infogreffe/Pappers de l'entreprise).
+- Dans les deux cas, **dégrader la méthode plutôt que de forcer les 8 étapes sur du vide** : rester sur ce qui est vérifiable (CA si communiqué, avis clients/marché, positionnement qualitatif), ne produire ni WACC, ni EVA, ni valorisation chiffrée sans base réelle, et le dire explicitement dans l'Executive Summary — « diagnostic partiel, comptes non accessibles publiquement » — plutôt que de combler par des proxys en cascade jusqu'à une recommandation qui n'a plus de socle.
 
 ## Les 8 Étapes
 
