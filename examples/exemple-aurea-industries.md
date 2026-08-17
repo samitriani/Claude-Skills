@@ -22,9 +22,9 @@ Analyse Auréa Industries
 | R&D | −51 | −55 | −59 |
 | Frais commerciaux | −68 | −74 | −78 |
 | Frais administratifs | −43 | −46 | −49 |
-| **EBIT (résultat opérationnel)** | 118 | 138 | 157 |
-| Dotations aux amortissements | 45 | 48 | 50 |
 | **EBITDA** | 163 | 186 | 207 |
+| Dotations aux amortissements | −45 | −48 | −50 |
+| **EBIT (résultat opérationnel)** | 118 | 138 | 157 |
 | Charges financières nettes | −14 | −13 | −12 |
 | Résultat avant impôt | 104 | 125 | 145 |
 | Impôt (taux effectif 25 %) | −26 | −31,25 | −36,25 |

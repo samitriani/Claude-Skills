@@ -38,7 +38,7 @@ Pour les formules détaillées et les seuils d'interprétation de chaque étape,
 
 **Actions :**
 - Récupérer le compte de résultat (2-3 ans minimum).
-- Calculer les marges en % du CA : marge brute, marge opérationnelle (EBIT/CA), marge EBITDA, marge nette.
+- Calculer les marges en % du CA : marge brute, marge EBITDA, marge opérationnelle (EBIT/CA), marge nette.
 - Décomposer la structure de coûts : coût des ventes, R&D, frais commerciaux, frais administratifs (chacun en % du CA).
 - Analyser l'évolution chronologique (tendance, effet ciseau).
 - Comparer aux concurrents du secteur.
