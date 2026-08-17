@@ -89,7 +89,7 @@ Pour les formules détaillées et les seuils d'interprétation de chaque étape,
 **Actions :**
 - Analyser le tableau des flux de trésorerie : flux d'exploitation, flux d'investissement, flux de financement.
 - Calculer le Free Cash-Flow = Flux d'exploitation – CAPEX.
-- Vérifier si le FCF est positif et récurrent. FCF négatif récurrent → "la croissance tue le cash".
+- Vérifier si le FCF est positif et récurrent. Un FCF négatif de façon récurrente signale que l'entreprise investit plus qu'elle ne génère de cash, ce qui n'est soutenable que si ce déficit est financé et que la croissance future le justifie.
 - Calculer le FCF Yield = FCF / Capitalisation boursière (si cotée).
 - Évaluer si l'entreprise peut autofinancer sa croissance ou doit recourir à l'endettement.
 
@@ -116,7 +116,7 @@ Pour les formules détaillées et les seuils d'interprétation de chaque étape,
 **Question :** L'entreprise crée-t-elle ou détruit-elle de la valeur ?
 
 **Actions :**
-- Comparer ROIC vs WACC. C'est LE moment de vérité.
+- Comparer ROIC vs WACC : c'est le test décisif de la création de valeur.
   - ROIC > WACC → Création de valeur (EVA positive) → actionnaires satisfaits.
   - ROIC < WACC → Destruction de valeur (EVA négative) → les actionnaires auraient mieux fait de placer leur argent ailleurs.
 - Calculer EVA = (ROIC – WACC) × Capitaux Employés.
