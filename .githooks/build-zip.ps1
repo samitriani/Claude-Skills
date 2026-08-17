@@ -20,7 +20,9 @@ $filesToZip = @(
     "SKILL.md",
     "references/formules.md",
     "examples/README.md",
-    "examples/exemple-aurea-industries.md"
+    "examples/exemple-aurea-industries.md",
+    "scripts/verifier_coherence.py",
+    "scripts/donnees-financieres.exemple.json"
 )
 
 if (Test-Path $dest) {

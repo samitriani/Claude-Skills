@@ -8,7 +8,7 @@ Skill Claude pour analyser la santé financière d'une entreprise cotée ou non 
 
 Sur une commande comme `Analyse [entreprise]`, il :
 
-1. **collecte les données publiques** de l'entreprise (rapport annuel, Boursorama, Zonebourse, Morningstar, presse financière), sur 2 à 3 ans minimum ;
+1. **collecte les données publiques** de l'entreprise (comptes déposés, rapport annuel, Boursorama, Zonebourse, presse financière), sur 2 à 3 ans minimum, avec une hiérarchie de sources et des règles de vérification explicites (Étape 0) ;
 2. **applique 8 étapes séquentielles**, chacune produisant des indicateurs chiffrés et une interprétation, pas juste des chiffres bruts :
    1. Analyse de la marge
    2. Actif économique (BFR, immobilisations)
@@ -18,8 +18,9 @@ Sur une commande comme `Analyse [entreprise]`, il :
    6. Coût des capitaux employés (WACC, MEDAF)
    7. Création de valeur (EVA, spread ROIC-WACC)
    8. Valeur d'entreprise (patrimoniale, multiples, DCF)
-3. **produit un artefact markdown structuré**, avec un Executive Summary en tête ;
-4. **conclut par une recommandation BUY / HOLD / SELL** avec prix cible et scénarios Bull / Base / Bear.
+3. **vérifie la cohérence des données avant de conclure** : un script (`scripts/verifier_coherence.py`) recalcule 6 identités comptables et un test de plausibilité sectorielle — si l'une échoue, le skill retourne chercher la donnée plutôt que de documenter l'écart ;
+4. **produit un artefact markdown structuré**, avec un Executive Summary en tête ;
+5. **conclut par une recommandation BUY / HOLD / SELL** avec prix cible et scénarios Bull / Base / Bear.
 
 ## Installation
 
@@ -34,7 +35,7 @@ L'installation diffère selon l'application utilisée.
 
 Skills est réservé aux plans payants (Pro, Max, Team, Enterprise) ; l'intitulé exact des menus peut varier selon les déploiements.
 
-Le zip contient uniquement `SKILL.md`, `references/` et `examples/` — pas `README.md` ni `LICENSE`, qui ne servent qu'à la publication GitHub. **Si tu modifies `SKILL.md` ou les fichiers `references/`/`examples/`, régénère le zip avant de le réimporter** — voir [Régénérer le zip](#régénérer-le-zip) plus bas.
+Le zip contient uniquement `SKILL.md`, `references/`, `examples/` et `scripts/` — pas `README.md` ni `LICENSE`, qui ne servent qu'à la publication GitHub. **Si tu modifies `SKILL.md` ou les fichiers `references/`/`examples/`/`scripts/`, régénère le zip avant de le réimporter** — voir [Régénérer le zip](#régénérer-le-zip) plus bas. Le contrôle automatique (`scripts/verifier_coherence.py`) ne fonctionne que si l'environnement dispose de l'exécution de code (variable selon le plan et les réglages Claude.ai) ; sinon le skill applique le repli manuel documenté dans `SKILL.md` §0.6.
 
 ### Claude Code (CLI, IDE, app de bureau)
 
@@ -94,8 +95,11 @@ analyse-financiere-entreprise/
 ├── examples/
 │   ├── README.md
 │   └── exemple-aurea-industries.md         # diagnostic complet, entreprise fictive
-└── references/
-    └── formules.md                         # formules, seuils, benchmarks sectoriels, glossaire
+├── references/
+│   └── formules.md                         # formules, seuils, benchmarks sectoriels, glossaire
+└── scripts/
+    ├── verifier_coherence.py               # contrôle automatique des identités comptables (§0.6 de SKILL.md)
+    └── donnees-financieres.exemple.json    # format du fichier de données, exemple réel (OCTO Technology)
 ```
 
 ## Régénérer le zip

@@ -16,7 +16,7 @@ Quand l'utilisateur demande "Analyse [entreprise]", suivre ce workflow :
 
 1. **Étape 0 — Collecter et vérifier les données** (ci-dessous). Ne jamais entamer les calculs sur des données non vérifiées.
 2. **Appliquer les 8 étapes** séquentiellement — chaque étape produit des indicateurs et une interprétation.
-3. **Passer les contrôles de cohérence** (section dédiée ci-dessous) — **avant** d'écrire l'Étape 6 et la restitution.
+3. **Passer les contrôles de cohérence**, de préférence via `scripts/verifier_coherence.py` (§ 0.6) — **avant** d'écrire l'Étape 6 et la restitution.
 4. **Produire un artefact** (fichier markdown ou HTML) contenant l'analyse complète.
 5. **Executive Summary** en tête du document avec les conclusions clés.
 6. **PER et PBR** — si l'entreprise est cotée, toujours calculer et analyser ces multiples.
@@ -56,14 +56,14 @@ Reconstruire un indicateur à partir de composants partiels donne un résultat f
 
 ### 0.4 — Traçabilité et propagation de l'incertitude
 
-Chaque donnée porte un statut :
+Chaque donnée porte un statut (valeurs exactes attendues dans `donnees-financieres.json`, § 0.6) :
 
 | Statut | Signification |
 |---|---|
-| `vérifié-source` | Confirmé sur le document ou la page source primaire |
+| `verifie-source` | Confirmé sur le document ou la page source primaire |
 | `secondaire` | Vient d'un agrégateur ou d'un rapport délégué, non re-vérifié |
-| `estimé` | Proxy ou hypothèse — la méthode de calcul doit être explicitée sur place |
-| `non-trouvé` | Recherché sans succès |
+| `estime` | Proxy ou hypothèse — la méthode de calcul doit être explicitée sur place |
+| `non-trouve` | Recherché sans succès |
 
 **Règle de propagation : tout indicateur dérivé hérite du statut le plus faible de ses inputs.** Un ROIC calculé à partir d'une dette `secondaire` est un ROIC `secondaire`, et l'EVA qui en découle aussi — jusque dans l'Executive Summary. Le lecteur doit voir où l'analyse est fragile sans avoir à le deviner.
 
@@ -83,6 +83,22 @@ Ne pas télécharger les comptes complets systématiquement (coûteux), ne jamai
 | Tout est cohérent, recoupé et suffisant pour les calculs | **Rester au niveau 2** — c'est légitime |
 
 **Dans un jeu de comptes complets, l'annexe vaut souvent plus que les tableaux chiffrés.** C'est elle qui révèle les malis de fusion, les conventions de trésorerie intragroupe (cash pooling), l'intégration fiscale, les engagements hors bilan et les transactions avec parties liées — autant d'éléments qui changent l'interprétation et qu'aucun tableau de synthèse ne montre.
+
+### 0.6 — Exécuter le contrôle automatique
+
+**Une instruction en prose peut être suivie ou rationalisée. Un script ne rationalise jamais.** Si l'environnement dispose de l'exécution de code (Bash/Python — vrai dans Claude Code, à vérifier ailleurs), le contrôle de cohérence (section dédiée plus bas) **n'est pas fait à la main : il est calculé par [`scripts/verifier_coherence.py`](scripts/verifier_coherence.py)**, sans dépendance externe.
+
+**Étapes :**
+
+1. À mesure que les données sont collectées (§ 0.1 à 0.4), les consigner dans un fichier `donnees-financieres.json`, un objet par exercice — voir [`scripts/donnees-financieres.exemple.json`](scripts/donnees-financieres.exemple.json) pour le format exact et la liste des champs reconnus. Chaque champ critique est un objet `{"valeur": ..., "statut": ..., "source": ...}`, pas juste un nombre nu.
+2. Exécuter :
+   ```bash
+   python scripts/verifier_coherence.py donnees-financieres.json
+   ```
+3. **Coller la sortie du script telle quelle** dans la section « Contrôles de cohérence » de l'artefact final (voir gabarit plus bas) — pas une reformulation, pas un résumé sélectif.
+4. Le script retourne un code de sortie non nul si un contrôle échoue **ou** si plus de la moitié des contrôles sont inexécutables faute de données. Dans les deux cas : ne pas rédiger les Étapes 6 à 8 avant d'avoir résolu la cause (escalade, § 0.5).
+
+**Si l'exécution de code n'est pas disponible** (par exemple certains contextes Claude.ai) : appliquer les contrôles C1 à C6 et le test de plausibilité manuellement, avec la même discipline — un contrôle qui échoue s'escalade, il ne se documente pas. Le signaler explicitement dans l'artefact (« contrôles effectués manuellement, outil de calcul indisponible ») plutôt que de laisser croire que le script a tourné.
 
 ## Les 8 Étapes
 
@@ -216,6 +232,8 @@ Les 8 étapes s'enchaînent en cascade : l'actif économique alimente le ROIC, l
 
 **Quand les exécuter** : après les Étapes 1 à 5 (dès que bilan et compte de résultat sont exploités), **avant** d'écrire les Étapes 6 à 8 et la restitution — c'est là que la cascade démarre.
 
+**Comment les exécuter** : via [`scripts/verifier_coherence.py`](scripts/verifier_coherence.py) quand l'exécution de code est disponible (§ 0.6) — c'est le mode par défaut. Les tableaux ci-dessous décrivent ce que le script calcule ; ils servent aussi de référence pour une exécution manuelle en repli.
+
 ### Contrôles d'identité comptable
 
 | # | Contrôle | Tolérance |
@@ -237,7 +255,7 @@ Vérifier que le profil de bilan correspond au modèle d'activité. Une violatio
 | **Distribution** | BFR négatif · rotation d'actif élevée · marge faible | BFR fortement positif → modèle atypique à expliquer |
 | **Industrie** | Immobilisations lourdes · stocks significatifs · intensité capitalistique élevée | Immobilisations faibles → activité sous-traitée ? |
 
-**Test de bon sens à appliquer systématiquement** : reconstituer mentalement les postes manquants et vérifier qu'ils sont possibles. Exemple : si capitaux propres + dette financière ≈ total du bilan, alors toutes les autres dettes valent zéro — impossible pour une entreprise qui paie des salaires et de la TVA. Ce raisonnement seul suffit à détecter une ventilation de passif erronée.
+**Test de bon sens à appliquer systématiquement** : reconstituer mentalement les postes manquants et vérifier qu'ils sont possibles. Exemple : si capitaux propres + dette financière ≈ total du bilan, alors toutes les autres dettes valent zéro — impossible pour une entreprise qui paie des salaires et de la TVA. Ce raisonnement seul suffit à détecter une ventilation de passif erronée. `verifier_coherence.py` l'implémente sous la forme du contrôle `PLAUS.` (masse salariale vs dettes fiscales et sociales).
 
 ### En cas d'échec d'un contrôle
 
@@ -245,11 +263,13 @@ Vérifier que le profil de bilan correspond au modèle d'activité. Une violatio
 
 1. **Ne pas documenter l'écart et poursuivre.** C'est le réflexe naturel et c'est l'erreur : expliquer pourquoi deux chiffres divergent ne les rend pas justes.
 2. **Escalader vers la source primaire** (§ 0.5) pour récupérer la donnée manquante ou corrigée.
-3. Si, après escalade, la donnée reste introuvable : **le dire explicitement, marquer les indicateurs dérivés comme `estimé`** (§ 0.4), et propager cette réserve jusqu'à l'Executive Summary. Ne jamais présenter comme établi un résultat dont un input est incertain.
+3. Si, après escalade, la donnée reste introuvable : **le dire explicitement, marquer les indicateurs dérivés comme `estime`** (§ 0.4), et propager cette réserve jusqu'à l'Executive Summary. Ne jamais présenter comme établi un résultat dont un input est incertain.
+
+Le script matérialise cette règle : il retourne un code de sortie non nul (`FAIL` sur un contrôle, ou trop de `N.A.`) précisément dans les cas où la suite ne doit pas être écrite sans escalade préalable.
 
 ### Restitution des contrôles
 
-Faire figurer dans l'artefact une section **« Contrôles de cohérence »** listant chaque contrôle avec son résultat (✓ / ✗ / non applicable) et les chiffres du rapprochement. Deux bénéfices : le lecteur vérifie que les contrôles ont réellement tourné, et il devient impossible de les contourner silencieusement.
+Faire figurer dans l'artefact une section **« Contrôles de cohérence »** avec, quand le script a tourné, **sa sortie brute collée telle quelle** (§ 0.6) ; à défaut, un tableau listant chaque contrôle avec son résultat (✓ / ✗ / non applicable) et les chiffres du rapprochement. Deux bénéfices : le lecteur vérifie que les contrôles ont réellement tourné, et il devient impossible de les contourner silencieusement.
 
 ## Structure de l'artefact de sortie
 
@@ -260,16 +280,15 @@ Produire un fichier markdown structuré ainsi :
 ## Date de l'analyse : [date]
 
 ## Fiabilité des données
-[Tableau : donnée → statut (vérifié-source / secondaire / estimé / non-trouvé) + source]
+[Tableau : donnée → statut (verifie-source / secondaire / estime / non-trouve) + source]
 [Signaler ici toute donnée critique non vérifiée directement]
 
 ## Executive Summary
 [3-5 bullets avec les conclusions clés : santé financière, création/destruction de valeur, valorisation, recommandation]
-[Chaque conclusion reposant sur une donnée `estimé` ou `secondaire` doit le mentionner]
+[Chaque conclusion reposant sur une donnée `estime` ou `secondaire` doit le mentionner]
 
 ## Contrôles de cohérence
-[C1 à C6 : ✓ / ✗ / n.a., avec les chiffres du rapprochement]
-[Tests de plausibilité structurelle : conforme au modèle d'activité ? écarts expliqués ?]
+[Sortie brute de scripts/verifier_coherence.py (§ 0.6) — ou, à défaut, C1 à C6 et le test de plausibilité calculés manuellement : ✓ / ✗ / n.a., avec les chiffres du rapprochement]
 
 ## 1. Analyse de la marge
 [Tableaux + interprétation]
@@ -304,8 +323,9 @@ Produire un fichier markdown structuré ainsi :
 - **Toujours chercher les données sur internet avant de calculer.** Les données publiées sont plus fiables que les estimations.
 - **Ne jamais inventer de chiffres.** Si une donnée est introuvable, le signaler et utiliser un proxy raisonnable en le justifiant.
 - **Vérifier les inputs critiques à la source** (§ 0.2). Un rapport de recherche délégué oriente vers la source, il ne la remplace pas.
+- **Exécuter `scripts/verifier_coherence.py`** (§ 0.6) dès que l'exécution de code est disponible, plutôt que de calculer les contrôles de tête. C'est un calcul, pas une vérification qu'on délègue à sa propre estimation.
 - **Ne jamais contourner un contrôle de cohérence en l'expliquant.** Si deux chiffres qui devraient converger divergent, la donnée est fausse — il faut aller la chercher, pas rédiger une note de bas de page.
-- **Propager l'incertitude** jusqu'à l'Executive Summary (§ 0.4). Un résultat calculé sur un input `estimé` reste `estimé`, quel que soit le soin du calcul.
+- **Propager l'incertitude** jusqu'à l'Executive Summary (§ 0.4). Un résultat calculé sur un input `estime` reste `estime`, quel que soit le soin du calcul.
 - **Toujours interpréter les chiffres**, pas juste les afficher. Chaque ratio doit être accompagné d'un commentaire sur ce qu'il signifie pour l'entreprise.
 - **Comparer systématiquement** aux pairs du secteur quand les données sont disponibles.
 - **PER et PBR obligatoires** pour toute entreprise cotée.
@@ -316,4 +336,6 @@ Produire un fichier markdown structuré ainsi :
 ## Ressources
 
 - [`references/formules.md`](references/formules.md) — formules détaillées, seuils d'interprétation, benchmarks sectoriels et glossaire pour chacune des 8 étapes
+- [`scripts/verifier_coherence.py`](scripts/verifier_coherence.py) — contrôle automatique des identités C1-C6 et du test de plausibilité (§ 0.6), sans dépendance externe
+- [`scripts/donnees-financieres.exemple.json`](scripts/donnees-financieres.exemple.json) — format attendu du fichier de données, illustré avec un jeu de données réel (OCTO Technology, comptes sociaux 2024-2025)
 - [`examples/`](examples/) — exemple complet commenté avec une entreprise fictive
