@@ -31,13 +31,12 @@ Le zip contient uniquement `SKILL.md` et `examples/` — pas `README.md` ni `LIC
 
 ### Claude Code (CLI, IDE, app de bureau)
 
-Copier le dossier dans le répertoire des skills de Claude :
+Ce skill fait partie du monorepo **Claude Skills**, qui regroupe plusieurs skills dans un seul dépôt GitHub. Cloner le dépôt, puis copier uniquement ce sous-dossier vers l'emplacement attendu par Claude Code (le nom du dossier de destination doit correspondre au champ `name` du frontmatter de `SKILL.md`) :
 
 ```bash
-git clone https://github.com/<votre-compte>/generation-cours.git ~/.claude/skills/generation-cours
+git clone https://github.com/<votre-compte>/claude-skills.git
+cp -r claude-skills/generation-cours ~/.claude/skills/generation-cours
 ```
-
-Le nom du dossier doit correspondre au champ `name` du frontmatter de `SKILL.md` (minuscules, chiffres et tirets uniquement) — c'est déjà le cas ici. Le nom du dépôt GitHub, lui, est libre.
 
 Le skill se déclenche ensuite sur des formulations comme « fais-moi un cours sur X », « j'ai besoin de monter en compétences sur X », « explique-moi X en profondeur », « forme-moi sur X » — même sans le mot « cours ». Il ne se déclenche pas sur une simple question factuelle ou une explication courte.
 
@@ -77,32 +76,31 @@ Ce skill écrit un fichier `.md` et le remet à l'utilisateur. L'emplacement exa
 ## Structure du dépôt
 
 ```
-generation-cours/
+generation-cours/                                     (sous-dossier du monorepo Claude Skills)
 ├── SKILL.md                                          # le skill lui-même
 ├── README.md
 ├── LICENSE
 ├── generation-cours.zip                              # package pour l'upload Claude.ai
-├── .githooks/
-│   ├── pre-commit                                    # régénère et ajoute le zip quand une source change
-│   └── build-zip.ps1                                 # construction du zip sous Windows
 └── examples/
     ├── README.md
     └── lean-portfolio-management-au-dela-de-safe.md  # cours complet en 8 modules
 ```
 
+Le hook qui régénère `generation-cours.zip` (`.githooks/`) vit à la racine du monorepo, pas dans ce sous-dossier — voir [`../README.md`](../README.md#régénérer-les-zips).
+
 ## Régénérer le zip
 
-Un hook `pre-commit` régénère `generation-cours.zip` automatiquement dès que `SKILL.md` ou un fichier de `examples/` fait partie du commit.
+Ce hook est partagé entre les skills du monorepo : un seul `.githooks/pre-commit`, à la racine, régénère le zip de **chaque** skill dès qu'un de ses fichiers sources fait partie du commit.
 
-**Activation (une fois par clone)** — git ne suit pas `.git/hooks/`, il faut donc pointer explicitement vers le dossier versionné du dépôt :
+**Activation (une fois par clone)**, depuis la racine du monorepo :
 
 ```bash
 git config core.hooksPath .githooks
 ```
 
-Le hook ([`.githooks/pre-commit`](.githooks/pre-commit)) utilise `zip` sur macOS/Linux, et [`.githooks/build-zip.ps1`](.githooks/build-zip.ps1) via PowerShell sur Windows (faute de `zip`). **Ne pas utiliser `Compress-Archive`** : sous Windows PowerShell 5.1, elle stocke les chemins avec des antislashs, ce qui viole la norme ZIP et fait échouer l'import dans Claude.ai.
+Détail du fonctionnement et des raisons de ne pas utiliser `Compress-Archive` sous Windows : voir [`../README.md#régénérer-les-zips`](../README.md#régénérer-les-zips).
 
-**Régénération manuelle** (si le hook n'est pas actif) :
+**Régénération manuelle de ce skill seul** (sans passer par le hook), depuis la racine du monorepo :
 
 ```bash
 # macOS / Linux
@@ -112,7 +110,7 @@ zip -r generation-cours.zip SKILL.md examples/
 
 ```powershell
 # Windows
-powershell -NoProfile -ExecutionPolicy Bypass -File .githooks\build-zip.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .githooks\build-zip.ps1 -Force
 ```
 
 ## Contribuer

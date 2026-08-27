@@ -35,13 +35,12 @@ Le zip contient uniquement `SKILL.md`, `references/` et `examples/` — pas `REA
 
 ### Claude Code (CLI, IDE, app de bureau)
 
-Copier le dossier dans le répertoire des skills de Claude :
+Ce skill fait partie du monorepo **Claude Skills**, qui regroupe plusieurs skills dans un seul dépôt GitHub. Cloner le dépôt, puis copier uniquement ce sous-dossier vers l'emplacement attendu par Claude Code (le nom du dossier de destination doit correspondre au champ `name` du frontmatter de `SKILL.md`) :
 
 ```bash
-git clone https://github.com/<votre-compte>/analyse-locative.git ~/.claude/skills/analyse-locative
+git clone https://github.com/<votre-compte>/claude-skills.git
+cp -r claude-skills/analyse-locative ~/.claude/skills/analyse-locative
 ```
-
-Le nom du dossier doit correspondre au champ `name` du frontmatter de `SKILL.md` (minuscules, chiffres et tirets uniquement) — c'est déjà le cas ici. Le nom du dépôt GitHub, lui, est libre.
 
 Le skill se déclenche ensuite sur toute formulation commençant par « Analyse locative ».
 
@@ -165,14 +164,11 @@ Le skill ne les calcule pas mais les mentionne quand elles s'appliquent :
 ## Structure du dépôt
 
 ```
-analyse-locative/
+analyse-locative/                     (sous-dossier du monorepo Claude Skills)
 ├── SKILL.md                          # le skill lui-même
 ├── README.md
 ├── LICENSE
 ├── analyse-locative.zip              # package pour l'upload Claude.ai (SKILL.md + references/ + examples/)
-├── .githooks/
-│   ├── pre-commit                    # régénère et ajoute le zip quand une source change
-│   └── build-zip.ps1                 # construction du zip sous Windows (contourne le bug Compress-Archive)
 ├── examples/
 │   ├── README.md
 │   ├── t2-ancien-saint-etienne.md    # session complète, ancien
@@ -184,21 +180,21 @@ analyse-locative/
     └── calculs.md                    # formules, hypothèses, limites
 ```
 
+Le hook qui régénère `analyse-locative.zip` (`.githooks/`) vit à la racine du monorepo, pas dans ce sous-dossier — voir [`../README.md`](../README.md#régénérer-les-zips).
+
 ## Régénérer le zip
 
-Un hook `pre-commit` régénère `analyse-locative.zip` automatiquement dès que `SKILL.md`, `references/calculs.md` ou un fichier de `examples/` fait partie du commit — sans lui, une archive périmée ferait tourner une version obsolète du skill dans Claude.ai.
+Ce hook est partagé entre les skills du monorepo : un seul `.githooks/pre-commit`, à la racine, régénère le zip de **chaque** skill dès qu'un de ses fichiers sources fait partie du commit — sans lui, une archive périmée ferait tourner une version obsolète du skill dans Claude.ai.
 
-**Activation (une fois par clone)** — git ne suit pas `.git/hooks/`, il faut donc pointer explicitement vers le dossier versionné du dépôt :
+**Activation (une fois par clone)**, depuis la racine du monorepo :
 
 ```bash
 git config core.hooksPath .githooks
 ```
 
-Le hook ([`.githooks/pre-commit`](.githooks/pre-commit)) détecte les fichiers sources modifiés, régénère le zip et l'ajoute au commit en cours. Sur macOS/Linux il utilise la commande `zip` ; sur Windows, faute de `zip`, il appelle [`.githooks/build-zip.ps1`](.githooks/build-zip.ps1) via PowerShell.
+Détail du fonctionnement, des raisons de ne pas utiliser `Compress-Archive` sous Windows, et de la structure partagée entre les trois skills : voir [`../README.md#régénérer-les-zips`](../README.md#régénérer-les-zips).
 
-**Pourquoi pas `Compress-Archive`** : sous Windows PowerShell 5.1, cette cmdlet stocke les chemins avec des antislashs (`references\calculs.md`), ce qui viole la norme ZIP (séparateur `/` requis) et fait échouer l'import dans Claude.ai avec l'erreur *« Zip file contains path with invalid characters »*. `build-zip.ps1` construit donc l'archive entrée par entrée via l'API .NET en forçant le bon séparateur.
-
-**Régénération manuelle** (si le hook n'est pas actif, par exemple juste après un clone avant d'avoir lancé la commande ci-dessus) :
+**Régénération manuelle de ce skill seul** (sans passer par le hook), depuis la racine du monorepo :
 
 ```bash
 # macOS / Linux
@@ -208,13 +204,13 @@ zip -r analyse-locative.zip SKILL.md references/ examples/
 
 ```powershell
 # Windows
-powershell -NoProfile -ExecutionPolicy Bypass -File .githooks\build-zip.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .githooks\build-zip.ps1 -Force
 ```
 
 Vérifier ensuite qu'aucune entrée ne contient de `\` :
 
 ```bash
-unzip -l analyse-locative.zip
+unzip -l analyse-locative/analyse-locative.zip
 ```
 
 ## Avertissement

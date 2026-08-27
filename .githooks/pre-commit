@@ -1,0 +1,34 @@
+#!/bin/sh
+# Garde à jour le zip de chaque skill (analyse-locative, analyse-financiere-entreprise,
+# generation-cours) dès qu'un de ses fichiers sources fait partie du commit.
+#
+# Ce hook n'est PAS actif automatiquement après un git clone (git ne suit pas
+# .git/hooks/). Activer une fois par clone avec :
+#   git config core.hooksPath .githooks
+#
+# La liste exacte des fichiers sources par skill est définie dans
+# .githooks/build-zip.ps1 (Windows) et .githooks/build-zip.sh (macOS/Linux) —
+# ce script ne fait qu'un filtrage rapide avant de déléguer, pour éviter de
+# lancer PowerShell/zip sur un commit qui ne touche aucun skill.
+
+set -e
+
+repo_root=$(git rev-parse --show-toplevel)
+cd "$repo_root"
+
+staged=$(git diff --cached --name-only --diff-filter=ACMR)
+
+# Sortie rapide si rien sous un dossier de skill n'est dans ce commit.
+if ! printf '%s\n' "$staged" | grep -qE '^(analyse-locative|analyse-financiere-entreprise|generation-cours)/'; then
+    exit 0
+fi
+
+if command -v powershell.exe >/dev/null 2>&1; then
+    powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$repo_root/.githooks/build-zip.ps1"
+elif command -v pwsh >/dev/null 2>&1; then
+    pwsh -NoProfile -ExecutionPolicy Bypass -File "$repo_root/.githooks/build-zip.ps1"
+elif command -v zip >/dev/null 2>&1; then
+    sh "$repo_root/.githooks/build-zip.sh"
+else
+    echo "pre-commit: ni PowerShell ni 'zip' trouvés — régénère les zips manuellement si besoin (voir le README du skill concerné)." >&2
+fi
