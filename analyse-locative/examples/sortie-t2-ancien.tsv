@@ -1,0 +1,5 @@
+Ville	Adresse / Description	Surface (m²)	Prix achat (€)	Frais notaire (€)	Coût total (€)	Emprunt nécessaire (€)	Mensualité 20 ans (€)	Mensualité 25 ans (€)	Loyer HC (€)	Fiabilité loyer	Charges copro /mois (€)	Taxe foncière /mois (€)	Assurance PNO /mois (€)	Vacance loc. /mois (€)	Rendement brut (%)	Rendement net (%)	Cashflow /mois 25 ans (€)	Lien annonce
+Saint-Étienne	T2 Châteaucreux 39 m²	39	39000	3120	42120	37120	215	186	420	Annonce réelle	45	35	12	35	12.9	8.3	107	https://exemple.invalid/annonce/se-001
+Saint-Étienne	T2 Fauriel 42 m²	42	52000	4160	56160	51160	297	256	480	Estimation marché	55	40	15	40	11.1	7.1	74	https://exemple.invalid/annonce/se-002
+Saint-Étienne	T2 Bellevue 45 m² loué	45	74000	5920	79920	74920	435	375	430	Loyer en place	70	45	15	36	7.0	4.0	-111	https://exemple.invalid/annonce/se-003
+Saint-Étienne	T2 Carnot 36 m²	36	45000	3600	48600	43600	253	218	445	Annonce réelle	50	32	12	37	11.9	7.8	96	https://exemple.invalid/annonce/se-004
