@@ -10,7 +10,7 @@ set -e
 repo_root=$(git rev-parse --show-toplevel)
 cd "$repo_root"
 
-sources="SKILL.md examples/README.md examples/exemple-cryptographie-post-quantique.md"
+sources="SKILL.md examples/README.md examples/lean-portfolio-management-au-dela-de-safe.md"
 
 staged=$(git diff --cached --name-only --diff-filter=ACMR)
 

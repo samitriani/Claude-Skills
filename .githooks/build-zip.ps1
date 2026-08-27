@@ -19,7 +19,7 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 $filesToZip = @(
     "SKILL.md",
     "examples/README.md",
-    "examples/exemple-cryptographie-post-quantique.md"
+    "examples/lean-portfolio-management-au-dela-de-safe.md"
 )
 
 if (Test-Path $dest) {

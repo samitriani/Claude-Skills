@@ -99,13 +99,7 @@ Si un sujet ne remonte que du Tier C, c'est une information en soi : le domaine 
 
 Pas par ordre alphabétique de sous-thèmes, pas par ordre chronologique d'apparition dans les recherches. La question à chaque module est : **qu'est-ce qu'il faut avoir compris avant de pouvoir comprendre ça ?**
 
-Progression type, à adapter :
-1. Pourquoi ce sujet existe — le problème qu'il résout, ce qu'on faisait avant
-2. Vocabulaire et cadre conceptuel — les distinctions qui structurent le domaine
-3-5. Mécanismes / fondations — le cœur, découpé par blocs cohérents
-6. Application — comment ça s'implémente, avec quels arbitrages
-7. Limites, échecs, controverses
-8. Écosystème et suite — acteurs, outils, où le domaine va
+Aucune structure imposée. Le nombre de modules, leur ordre et leur découpage se déduisent du sujet lui-même et de ce que la recherche a fait apparaître — pas d'un gabarit générique. Les controverses et les limites doivent être traitées quelque part dans le plan (pas forcément en fin, pas forcément dans un module dédié), et l'ancrage terrain (couche 3) doit irriguer plusieurs modules plutôt que d'être relégué à un seul.
 
 ### Présenter le plan
 
@@ -113,6 +107,8 @@ En chat, compact : titre de chaque module + une ligne sur son contenu + volume e
 - Ce que la recherche a fait apparaître d'inattendu et qui a influencé le plan
 - Les zones où les sources sont faibles ou contradictoires
 - 1 ou 2 arbitrages assumés (« j'ai mis X en module 6 plutôt qu'en 2 parce que… »)
+
+Signaler aussi, module par module, si un schéma est prévu (voir Phase 4 — Schémas) et lequel type.
 
 Puis attendre. Ajuster autant que nécessaire.
 
@@ -128,35 +124,23 @@ Le cours va dans un seul fichier `.md`. L'emplacement dépend de l'environnement
 
 **Écrire module par module, pas en un seul jet** : créer le fichier avec l'en-tête et le module 1, puis ajouter chaque module suivant par des éditions successives (append), avec l'outil d'écriture/édition de fichier disponible dans l'environnement. Un cours de 9000 mots produit d'une traite se dégrade en fin de parcours et risque la troncature. Module par module, chacun reçoit la même attention.
 
-### Trame de module — s'y tenir
+### Contenu de chaque module
 
-La trame fixe est ce qui empêche un module de dégénérer en survol.
+Pas de trame fixe. La forme (analogie ou non, formalisme ou non, ordre des sous-parties) se décide au cas par cas selon ce que le sujet exige. Ce qui reste requis, quelle que soit la forme :
+- Une définition claire de ce qu'on saura faire ou distinguer à la fin du module.
+- Au moins un exemple concret tiré des sources — acteur nommé, chiffre, cas réel.
+- Les erreurs ou confusions fréquentes sur ce point, quand la recherche (couche 4) en a fait remonter.
+- Les controverses ou limites propres au module, quand elles existent — pas reléguées systématiquement à la fin du cours.
 
-```markdown
-## Module N — [Titre]
+### Schémas
 
-> **À la fin de ce module :** [1-2 lignes, ce que le lecteur saura faire ou distinguer]
+Un seul livrable : le `.md`. Les schémas sont des blocs Mermaid intégrés directement dans le texte du module, jamais un fichier séparé ni une image externe.
 
-### L'intuition
-[Le concept en langage ordinaire, avec une analogie si elle est juste.
-Pas de jargon avant de l'avoir introduit.]
+Un schéma se justifie quand le concept est **intrinsèquement visuel** — une structure, un flux, une hiérarchie, une comparaison, une séquence temporelle sont plus clairs en diagramme qu'en prose. Ce n'est pas systématique : la plupart des modules n'ont besoin d'aucun schéma. Un schéma qui n'ajoute rien à ce que la prose dit déjà est un remplissage visuel — même défaut que le remplissage textuel.
 
-### Le fond
-[Définitions précises, mécanisme, formalisme si le sujet en a un.
-C'est la partie longue. En prose argumentée — un enchaînement de puces
-ne fait pas comprendre pourquoi les choses tiennent ensemble.]
+Types Mermaid à mobiliser selon le besoin : `flowchart` pour un processus ou une décision, `graph` pour une architecture ou des relations, `timeline` pour une chronologie, `quadrantChart` pour une comparaison à deux axes, `sequenceDiagram` pour une interaction entre acteurs. Choisir le type qui correspond à la nature du concept, pas le premier venu.
 
-### En pratique
-[Un exemple concret et détaillé, tiré des sources.
-Nommer les acteurs, donner les chiffres, citer le cas réel.]
-
-### Pièges
-[2-4 erreurs que font les gens qui débutent sur ce point.
-Puisées dans la couche 4 de recherche.]
-
-### À retenir
-- [3 à 5 points]
-```
+Chaque schéma est placé au point du texte où il éclaire le propos — jamais regroupé en annexe — et introduit par une phrase qui dit ce qu'il montre, pas juste "voir le schéma ci-dessous".
 
 ### Règles de contenu
 
@@ -168,8 +152,6 @@ Puisées dans la couche 4 de recherche.]
 - `[émergent]` si trop récent pour être validé
 
 **Ne pas combler les trous.** Si un module manque de matière solide, deux options : le fusionner avec un autre, ou écrire explicitement « cette zone est peu documentée — voici ce qui existe et ce qui manque ». Jamais d'étirement par du contenu plausible.
-
-**Prose plutôt que puces.** Les puces servent aux énumérations réelles et aux récapitulatifs. Un raisonnement en puces perd les liens logiques, qui sont précisément ce qu'on essaie d'enseigner.
 
 **Nommer les choses.** « Certaines entreprises » → « Netflix, dans son postmortem de 2024 ». Le concret est ce qui rend un cours mémorisable.
 
@@ -205,4 +187,4 @@ Ce qui fait échouer ce skill, par ordre de fréquence :
 
 ## Ressources
 
-- [`examples/`](examples/) — un cadrage, un plan validé et un module complet rédigés pour un sujet exemple, illustrant le format attendu à chaque phase
+- [`examples/`](examples/) — un cours complet illustrant le format attendu : plan par dépendances conceptuelles, modules sans trame fixe mais avec les quatre exigences de fond, glossaire, vérification de compréhension, bibliographie hiérarchisée

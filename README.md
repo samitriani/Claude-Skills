@@ -11,7 +11,7 @@ Sur une commande comme `Fais-moi un cours sur [sujet]`, il déroule un pipeline 
 1. **Cadrage** — infère l'angle depuis le contexte, ne pose qu'une question si un choix structurant reste ambigu (ex. angle technique vs stratégique).
 2. **Recherche en 4 couches** (15 à 25 recherches) — canon académique, état de l'art récent, retours d'expérience opérationnels, controverses. Chaque couche apporte quelque chose que les autres n'ont pas.
 3. **Plan, validé avant écriture** — **point d'arrêt obligatoire** : le plan est présenté en chat et attend une validation avant que le moindre module ne soit rédigé.
-4. **Rédaction module par module** — chaque module suit une trame fixe (intuition → fond → pratique → pièges → à retenir), écrit en plusieurs passes pour éviter la dégradation de qualité sur un texte long produit d'une traite.
+4. **Rédaction module par module** — pas de trame fixe imposée (la forme se décide selon le sujet), mais quatre exigences de fond systématiques : objectif clair, exemple concret nommé, erreurs fréquentes quand la recherche en a fait remonter, controverses traitées dans le module concerné plutôt que reléguées en fin de cours. Des schémas Mermaid s'insèrent quand un concept est intrinsèquement visuel. Écrit en plusieurs passes pour éviter la dégradation de qualité sur un texte long produit d'une traite.
 5. **Ancrage et livraison** — glossaire, questions de compréhension, bibliographie hiérarchisée, puis remise du fichier.
 
 ## Installation
@@ -60,6 +60,8 @@ Aucun paramètre à fournir au-delà du sujet — le skill infère l'angle et ne
 - **Statut épistémique marqué** : `[débattu]` quand les experts ne sont pas d'accord, `[émergent]` quand c'est trop récent pour être validé — plutôt que de présenter tout le contenu au même niveau de certitude.
 - **Aucune zone comblée par du contenu plausible.** Une zone mal documentée est signalée comme telle, avec ce qui manque, plutôt qu'étirée pour atteindre le volume cible.
 - **Le plan est validé avant la rédaction.** Écrire 9000 mots dans la mauvaise direction est traité comme le pire échec possible du skill — pas un point de détail.
+- **Pas de gabarit rigide par module.** La forme (analogie ou non, formalisme ou non) suit ce que le sujet exige plutôt qu'un schéma imposé identique pour les 8 modules — mais quatre exigences de fond restent systématiques (voir ci-dessus).
+- **Schémas seulement quand ils apportent quelque chose.** Un bloc Mermaid intégré au texte quand un concept est intrinsèquement visuel (flux, hiérarchie, chronologie, comparaison) — jamais systématique, jamais en annexe.
 
 ## Mécanique d'exécution et portabilité
 
@@ -85,7 +87,7 @@ generation-cours/
 │   └── build-zip.ps1                                 # construction du zip sous Windows
 └── examples/
     ├── README.md
-    └── exemple-cryptographie-post-quantique.md       # cadrage, plan et un module rédigé
+    └── lean-portfolio-management-au-dela-de-safe.md  # cours complet en 8 modules
 ```
 
 ## Régénérer le zip
