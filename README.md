@@ -9,7 +9,7 @@ Monorepo regroupant plusieurs [Claude Skills](https://www.anthropic.com/news/ski
 | Skill | Ce qu'il fait |
 |---|---|
 | [`analyse-locative/`](analyse-locative) | Analyse d'investissement locatif en France (rentabilité, cash-flow, fiscalité, contexte de marché INSEE) à partir d'une annonce ou d'un descriptif de bien. |
-| [`analyse-financiere-entreprise/`](analyse-financiere-entreprise) | Diagnostic financier en 8 étapes d'une entreprise cotée ou non cotée (marges, ROIC, WACC, EVA, valorisation) jusqu'à une recommandation BUY / HOLD / SELL, avec contrôle de cohérence automatique des données. |
+| [`analyse-financiere-entreprise/`](analyse-financiere-entreprise) | Diagnostic financier en 8 étapes d'une entreprise cotée ou non cotée (marges, ROIC, WACC, EVA, valorisation) jusqu'à une recommandation BUY / HOLD / SELL argumentée. |
 | [`generation-cours/`](generation-cours) | Génération d'un cours écrit complet et sourcé (8-10k mots, 8 modules) sur n'importe quel sujet, avec recherche en 4 couches et point d'arrêt de validation du plan avant rédaction. |
 
 Chaque skill est autonome : son propre `SKILL.md`, son `README.md`, sa `LICENSE`, ses `examples/` et son zip packagé pour Claude.ai. Voir le README de chaque sous-dossier pour le détail de son fonctionnement, ses limites et son installation.

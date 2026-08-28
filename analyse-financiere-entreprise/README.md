@@ -8,7 +8,7 @@ Skill Claude pour analyser la santé financière d'une entreprise cotée ou non 
 
 Sur une commande comme `Analyse [entreprise]`, il :
 
-1. **collecte les données publiques** de l'entreprise (comptes déposés, rapport annuel, Boursorama, Zonebourse, presse financière), sur 2 à 3 ans minimum, avec une hiérarchie de sources et des règles de vérification explicites (Étape 0) ;
+1. **collecte les données publiques** de l'entreprise (rapport annuel, Boursorama, Zonebourse, Morningstar, presse financière — et pappers.fr/societe.com pour les PME françaises non cotées), sur 2 à 3 ans minimum ;
 2. **applique 8 étapes séquentielles**, chacune produisant des indicateurs chiffrés et une interprétation, pas juste des chiffres bruts :
    1. Analyse de la marge
    2. Actif économique (BFR, immobilisations)
@@ -18,9 +18,8 @@ Sur une commande comme `Analyse [entreprise]`, il :
    6. Coût des capitaux employés (WACC, MEDAF)
    7. Création de valeur (EVA, spread ROIC-WACC)
    8. Valeur d'entreprise (patrimoniale, multiples, DCF)
-3. **vérifie la cohérence des données avant de conclure** : un script (`scripts/verifier_coherence.py`) recalcule 6 identités comptables et un test de plausibilité sectorielle — si l'une échoue, le skill retourne chercher la donnée plutôt que de documenter l'écart ;
-4. **produit un artefact markdown structuré**, avec un Executive Summary en tête ;
-5. **conclut par une recommandation BUY / HOLD / SELL** avec prix cible et scénarios Bull / Base / Bear.
+3. **produit un artefact markdown structuré**, avec un Executive Summary en tête ;
+4. **conclut par une recommandation BUY / HOLD / SELL** avec prix cible et scénarios Bull / Base / Bear.
 
 ## Installation
 
@@ -35,15 +34,15 @@ L'installation diffère selon l'application utilisée.
 
 Skills est réservé aux plans payants (Pro, Max, Team, Enterprise) ; l'intitulé exact des menus peut varier selon les déploiements.
 
-Le zip contient uniquement `SKILL.md`, `references/`, `examples/` et `scripts/` — pas `README.md` ni `LICENSE`, qui ne servent qu'à la publication GitHub. **Si tu modifies `SKILL.md` ou les fichiers `references/`/`examples/`/`scripts/`, régénère le zip avant de le réimporter** — voir [Régénérer le zip](#régénérer-le-zip) plus bas. Le contrôle automatique (`scripts/verifier_coherence.py`) ne fonctionne que si l'environnement dispose de l'exécution de code (variable selon le plan et les réglages Claude.ai) ; sinon le skill applique le repli manuel documenté dans `SKILL.md` §0.6.
+Le zip contient uniquement `SKILL.md`, `formulas.md` et `examples/` — pas `README.md` ni `LICENSE`, qui ne servent qu'à la publication GitHub. **Si tu modifies `SKILL.md`, `formulas.md` ou `examples/`, régénère le zip avant de le réimporter** — voir [Régénérer le zip](#régénérer-le-zip) plus bas.
 
 ### Claude Code (CLI, IDE, app de bureau)
 
 Ce skill fait partie du monorepo **Claude Skills**, qui regroupe plusieurs skills dans un seul dépôt GitHub. Cloner le dépôt, puis copier uniquement ce sous-dossier vers l'emplacement attendu par Claude Code (le nom du dossier de destination doit correspondre au champ `name` du frontmatter de `SKILL.md`) :
 
 ```bash
-git clone https://github.com/<votre-compte>/claude-skills.git
-cp -r claude-skills/analyse-financiere-entreprise ~/.claude/skills/analyse-financiere-entreprise
+git clone https://github.com/samitriani/Claude-Skills.git
+cp -r Claude-Skills/analyse-financiere-entreprise ~/.claude/skills/analyse-financiere-entreprise
 ```
 
 Le skill se déclenche ensuite sur toute formulation commençant par « Analyse [entreprise] », ou sur des expressions comme « diagnostic financier », « valorisation », « ROIC », « WACC », « EVA », « création de valeur ».
@@ -51,7 +50,7 @@ Le skill se déclenche ensuite sur toute formulation commençant par « Analyse 
 ## Utilisation
 
 ```
-Analyse Auréa Industries
+Analyse Sopra Steria
 Diagnostic financier de [entreprise]
 Est-ce que [entreprise] crée de la valeur ?
 Valorisation de [entreprise]
@@ -65,7 +64,7 @@ Aucun paramètre à fournir au-delà du nom de l'entreprise — le skill collect
 - Recherche en français pour les entreprises françaises/européennes.
 - Recoupement de plusieurs sources pour fiabiliser les chiffres.
 - Minimum 2 à 3 années de données pour dégager une tendance.
-- Ordre de priorité des sources : rapport annuel officiel > Boursorama/Zonebourse > Morningstar > presse financière.
+- Ordre de priorité des sources : rapport annuel officiel > Boursorama/Zonebourse > Morningstar > presse financière (pappers.fr/societe.com en plus pour une PME française non cotée).
 - **Aucun chiffre inventé.** Une donnée introuvable est signalée comme telle, avec un proxy raisonnable justifié si nécessaire (ex. bêta sectoriel Damodaran à défaut du bêta de l'entreprise).
 
 ## Format de sortie
@@ -78,24 +77,21 @@ Un document markdown structuré en 8 sections (une par étape) précédées d'un
 - **Sensible aux hypothèses.** Le prix cible DCF varie significativement avec le WACC et le taux de croissance perpétuel retenus — toujours regarder la fourchette de sensibilité, pas seulement le chiffre central.
 - **Aussi fiable que les données trouvées.** Une entreprise peu couverte par la presse financière ou non cotée aura des données plus incertaines (bêta proxy, comparables approximatifs) — le skill le signale plutôt que de présenter un chiffre unique comme certain.
 
-Le détail des formules, seuils d'interprétation et limites de chaque étape est dans [`references/formules.md`](references/formules.md).
+Le détail des formules, seuils d'interprétation et limites de chaque étape est dans [`formulas.md`](formulas.md).
 
 ## Structure du dépôt
 
 ```
 analyse-financiere-entreprise/             (sous-dossier du monorepo Claude Skills)
 ├── SKILL.md                                # le skill lui-même
+├── formulas.md                             # formules, seuils, benchmarks sectoriels, glossaire
 ├── README.md
 ├── LICENSE
 ├── analyse-financiere-entreprise.zip       # package pour l'upload Claude.ai
-├── examples/
-│   ├── README.md
-│   └── exemple-aurea-industries.md         # diagnostic complet, entreprise fictive
-├── references/
-│   └── formules.md                         # formules, seuils, benchmarks sectoriels, glossaire
-└── scripts/
-    ├── verifier_coherence.py               # contrôle automatique des identités comptables (§0.6 de SKILL.md)
-    └── donnees-financieres.exemple.json    # format du fichier de données, exemple réel (OCTO Technology)
+└── examples/
+    ├── README.md
+    ├── Analyse-Financiere-OCTO-Technology.md   # entreprise non cotée
+    └── Analyse-Financiere-Sopra-Steria.md      # grand groupe coté
 ```
 
 Le hook qui régénère `analyse-financiere-entreprise.zip` (`.githooks/`) vit à la racine du monorepo, pas dans ce sous-dossier — voir [`../README.md`](../README.md#régénérer-les-zips).
@@ -117,7 +113,7 @@ Détail du fonctionnement et des raisons de ne pas utiliser `Compress-Archive` s
 ```bash
 # macOS / Linux
 cd analyse-financiere-entreprise
-zip -r analyse-financiere-entreprise.zip SKILL.md references/ examples/ scripts/
+zip -r analyse-financiere-entreprise.zip SKILL.md formulas.md examples/
 ```
 
 ```powershell

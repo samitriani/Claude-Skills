@@ -61,7 +61,7 @@
 
 ### Interprétation
 
-- **BFR négatif** : l'entreprise est financée par ses fournisseurs, typiquement dans la grande distribution ou chez des équipementiers à forte puissance d'achat. Très favorable.
+- **BFR négatif** : l'entreprise est financée par ses fournisseurs (ex: grande distribution, Valeo). Très favorable.
 - **BFR élevé et croissant** : la croissance consomme du cash, attention au piège de la croissance.
 - **Degré d'usure < 30%** : outil industriel vieillissant, sous-investissement probable.
 - **CAPEX / Amortissements > 1** : l'entreprise investit pour renouveler et développer son outil.
@@ -88,9 +88,9 @@
 - **ROIC 8-15%** : bonne rentabilité.
 - **ROIC 5-8%** : rentabilité moyenne, attention si le WACC est proche.
 - **ROIC < 5%** : faible rentabilité, risque de destruction de valeur.
-- **Forte marge × faible rotation** : modèle luxe / pharma — peu de volume, marge unitaire élevée.
-- **Faible marge × forte rotation** : modèle distribution — marge unitaire faible compensée par un volume de rotation élevé.
-- Deux entreprises peuvent afficher un ROIC comparable par des chemins opposés : l'une portée surtout par la marge, l'autre surtout par la rotation de l'actif. Toujours passer par la décomposition DuPont avant de comparer deux ROIC entre eux — un même chiffre final peut cacher deux modèles économiques très différents (voir l'exemple chiffré d'[`examples/exemple-aurea-industries.md`](../examples/exemple-aurea-industries.md)).
+- **Forte marge × faible rotation** : modèle luxe/pharma (Hermès, LVMH).
+- **Faible marge × forte rotation** : modèle distribution (Carrefour : marge ~2% mais rotation ~4x).
+- Exemple cours : Nokia avait 31% de ROIC grâce à rotation de 4,4x. Volkswagen seulement 2% avec marge et rotation faibles.
 
 ---
 
@@ -130,7 +130,7 @@
 ### Interprétation
 
 - **FCF positif et récurrent** : l'entreprise peut autofinancer sa croissance, rembourser ses dettes, verser des dividendes. Idéal.
-- **FCF négatif récurrent** : l'entreprise investit plus qu'elle ne génère de cash. Soutenable uniquement si ce déficit est financé et si le ROIC futur le justifie.
+- **FCF négatif récurrent** : "la croissance tue le cash" — l'entreprise investit plus qu'elle ne génère. Soutenable uniquement si financé et si le ROIC futur le justifie.
 - **FCF Yield > 5%** : action potentiellement attractive.
 - **Conversion cash (FCF/EBITDA) > 50%** : bonne conversion du profit en cash.
 - **Configuration saine** : flux opérationnel positif, flux d'investissement négatif (on investit), flux de financement qui équilibre.
@@ -158,6 +158,7 @@ Où :
 - T = Taux effectif d'imposition
 
 **Coût des capitaux propres (MEDAF / CAPM) :**
+
 ```
 Ke = Rf + β × (Rm – Rf)
 ```
@@ -169,9 +170,11 @@ Ke = Rf + β × (Rm – Rf)
 | Rm – Rf (prime de risque) | Consensus / Damodaran | 5 – 7% |
 
 **Coût de la dette :**
+
 ```
 Kd = Charges financières / Dettes financières brutes moyennes
 ```
+
 Ou taux des dernières émissions obligataires.
 
 ### Interprétation
@@ -204,13 +207,12 @@ Ou taux des dernières émissions obligataires.
 - **ROIC = WACC** → Ni création ni destruction. L'entreprise rémunère exactement le coût de ses ressources.
 
 ### Corrélation statistique
-Le ratio ROIC/WACC explique une part significative des variations de valorisation boursière observées empiriquement (R² de l'ordre de 0,6 à 0,7 selon les études). Ce n'est pas juste théorique : les entreprises avec un fort spread ont un PBR élevé.
+Le ratio ROIC/WACC explique environ 2/3 des variations de valorisation boursière (R² ≈ 0,66). Ce n'est pas juste théorique : les entreprises avec un fort spread ont un PBR élevé.
 
-### Ce qui soutient un spread durablement élevé ou négatif
-
-Un ROIC très supérieur au WACC sur plusieurs années signale généralement un avantage concurrentiel défendable (marque forte, effet de réseau, position dominante, barrières à l'entrée) plutôt qu'un simple pic conjoncturel — à vérifier avant de l'extrapoler dans une valorisation DCF. À l'inverse, une capitalisation boursière durablement inférieure aux capitaux propres comptables (PBR < 1) signale une destruction de valeur perçue par le marché : secteur en difficulté structurelle, allocation de capital jugée inefficace, ou risque de gouvernance non reflété dans les comptes.
-
-Un exemple chiffré complet (calcul de l'EVA pas à pas sur une entreprise fictive) est disponible dans [`examples/exemple-aurea-industries.md`](../examples/exemple-aurea-industries.md).
+### Cas remarquables (exemples du cours)
+- **Coca-Cola** : ROIC > 20%, EVA très positive. Maintenue grâce au marketing massif (20-30% du CA en pub), présence physique mondiale, accords exclusifs d'embouteillage.
+- **Peugeot** (cas historique) : Capitalisation boursière 2,2 Mds vs capitaux propres comptables 13,8 Mds → massive destruction de valeur (PBR ≈ 0,16).
+- **Atos** (2012) : WACC 12%, ROIC 14,6% → création de valeur positive.
 
 ---
 
@@ -221,6 +223,7 @@ Un exemple chiffré complet (calcul de l'EVA pas à pas sur une entreprise ficti
 ```
 ANR = Actifs réévalués – Dettes
 ```
+
 Inclure : plus-values latentes sur immobilier, marques non comptabilisées, brevets.
 Exclure : goodwill si non justifié par des cash-flows.
 
@@ -242,16 +245,20 @@ Valeur d'entreprise = Σ(t=1 à n) [FCF_t / (1 + WACC)^t] + VT / (1 + WACC)^n
 ```
 
 **Valeur terminale (Gordon-Shapiro) :**
+
 ```
 VT = FCF_n × (1 + g) / (WACC – g)
 ```
+
 - g = taux de croissance perpétuelle (typiquement 1,5 – 2,5%, ne jamais dépasser le PIB nominal long terme).
 
 **Valeur des capitaux propres :**
+
 ```
 Valeur CP = Valeur d'entreprise – Dette financière nette
 Prix cible par action = Valeur CP / Nombre d'actions
 ```
+
 
 **Analyse de sensibilité :** Toujours faire varier WACC (±0,5-1%) et g (±0,5%) pour montrer la fourchette de valorisation.
 

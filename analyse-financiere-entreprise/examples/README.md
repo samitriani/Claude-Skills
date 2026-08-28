@@ -1,15 +1,14 @@
 # Exemples
 
+Deux diagnostics complets en 8 étapes, sur des entreprises réelles, pour illustrer le format de sortie attendu (voir « Structure de l'artefact de sortie » dans [`SKILL.md`](../SKILL.md)) sur deux profils différents.
+
+Ces fichiers sont aussi embarqués dans [`analyse-financiere-entreprise.zip`](../analyse-financiere-entreprise.zip), le package uploadé dans Claude.ai — toute modification ici doit être suivie d'une régénération du zip (automatique via le hook `pre-commit`, voir [Régénérer le zip](../README.md#régénérer-le-zip)).
+
 | Fichier | Cas illustré |
 |---------|--------------|
-| [`exemple-aurea-industries.md`](exemple-aurea-industries.md) | Diagnostic complet en 8 étapes, entreprise fictive « Auréa Industries » — cas nuancé (HOLD, valorisation quasi alignée sur le cours) plutôt qu'un BUY ou SELL évident |
+| [`Analyse-Financiere-OCTO-Technology.md`](Analyse-Financiere-OCTO-Technology.md) | Société non cotée (filiale à 100 % d'Accenture) — pas de PER/PBR/DCF actionnarial, méthodologie adaptée en conséquence, valorisation limitée aux multiples |
+| [`Analyse-Financiere-Sopra-Steria.md`](Analyse-Financiere-Sopra-Steria.md) | Grand groupe coté (Euronext Paris) — comptes consolidés, WACC via MEDAF, PER/PBR, recommandation argumentée |
 
 ## Avertissement
 
-Toutes les données de cet exemple sont **fictives** : compte de résultat, bilan, cours de bourse et recommandation sont inventés pour que les calculs s'enchaînent de façon cohérente d'une étape à l'autre. Ils servent uniquement à illustrer le format de sortie attendu (voir « Structure de l'artefact de sortie » dans [`SKILL.md`](../SKILL.md)) et la logique des formules.
-
-Dans une exécution réelle, chaque chiffre est recherché et sourcé (rapport annuel officiel, Boursorama, Zonebourse, Morningstar…) — jamais inventé.
-
-## Vérifier la cohérence d'un exemple
-
-Les ratios d'un diagnostic se recoupent entre eux (le ROIC de l'Étape 3 doit redonner l'EVA de l'Étape 7, le WACC de l'Étape 6 doit être cohérent avec le DCF de l'Étape 8…). Avant de publier un nouvel exemple, refaire les calculs à la main ou via un tableur pour vérifier qu'aucun chiffre n'est incohérent avec un autre.
+Contrairement aux exemples avec données fictives d'autres skills de ce dépôt, ces deux analyses portent sur des **entreprises réelles**, à partir de données publiques (comptes déposés, communiqués officiels, cotations de marché). Elles restent des illustrations du format de sortie — elles ne constituent pas un conseil en investissement (voir « Ce que l'analyse n'est pas » dans le [`README.md`](../README.md) du skill).

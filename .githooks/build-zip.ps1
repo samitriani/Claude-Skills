@@ -40,11 +40,10 @@ $skills = @(
         Zip  = "analyse-financiere-entreprise.zip"
         Files = @(
             "SKILL.md",
-            "references/formules.md",
+            "formulas.md",
             "examples/README.md",
-            "examples/exemple-aurea-industries.md",
-            "scripts/verifier_coherence.py",
-            "scripts/donnees-financieres.exemple.json"
+            "examples/Analyse-Financiere-OCTO-Technology.md",
+            "examples/Analyse-Financiere-Sopra-Steria.md"
         )
     },
     @{

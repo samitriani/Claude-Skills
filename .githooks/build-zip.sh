@@ -52,9 +52,8 @@ build_skill "analyse-locative" "analyse-locative.zip" \
     "examples/t2-ancien-saint-etienne.md" "examples/t3-neuf-angers.md"
 
 build_skill "analyse-financiere-entreprise" "analyse-financiere-entreprise.zip" \
-    "SKILL.md" "references/formules.md" "examples/README.md" \
-    "examples/exemple-aurea-industries.md" "scripts/verifier_coherence.py" \
-    "scripts/donnees-financieres.exemple.json"
+    "SKILL.md" "formulas.md" "examples/README.md" \
+    "examples/Analyse-Financiere-OCTO-Technology.md" "examples/Analyse-Financiere-Sopra-Steria.md"
 
 build_skill "generation-cours" "generation-cours.zip" \
     "SKILL.md" "examples/README.md" "examples/lean-portfolio-management-au-dela-de-safe.md"
